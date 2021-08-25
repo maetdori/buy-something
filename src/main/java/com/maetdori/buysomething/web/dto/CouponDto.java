@@ -1,11 +1,9 @@
 package com.maetdori.buysomething.web.dto;
 
 import com.maetdori.buysomething.domain.Coupon.Coupon;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 public class CouponDto {
 	private Long id;
 	private String name;
