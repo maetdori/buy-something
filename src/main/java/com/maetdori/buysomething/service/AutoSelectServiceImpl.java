@@ -1,6 +1,5 @@
 package com.maetdori.buysomething.service;
 
-import com.maetdori.buysomething.exception.NoSuchUserException;
 import com.maetdori.buysomething.web.dto.CouponDto;
 import com.maetdori.buysomething.web.dto.PointDto;
 import com.maetdori.buysomething.web.dto.UserDto;
@@ -13,37 +12,44 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.maetdori.Util.calcPercentage.calcPercentage;
+import static com.maetdori.buysomething.Util.calcPercentage.calcPercentage;
 
 @RequiredArgsConstructor
 @Service
 public class AutoSelectServiceImpl implements AutoSelectService {
-	private final UserInfoService userInfoService;
+	private int cartAmount;
 	private int payAmount;
 
 	@Override
 	@Transactional
-	public UserDto.AutoSelect getSelection(UserDto.Request userRequest) throws NoSuchUserException {
-		UserDto.Info user = userInfoService.getUserInfo(userRequest);
-		payAmount = userRequest.getAmount();
+	public UserDto.Selection getSelection(UserDto.Info autoSelectRequest) {
+		cartAmount = autoSelectRequest.getCartAmount();
+		payAmount = cartAmount;
 
-		CouponDto couponToUse = selectCoupon(user.getCoupons());
-		List<PointDto.Selected> pointsToUse = selectPoints(user.getPoints());
-		int savingsToUse = selectSavings(user.getSavings());
+		CouponDto couponToUse = selectCoupon(autoSelectRequest.getCoupons());
+		List<PointDto.Selected> pointsToUse = selectPoints(autoSelectRequest.getPoints());
+		int savingsToUse = selectSavings(autoSelectRequest.getSavings());
 
-		return new UserDto.AutoSelect(payAmount, savingsToUse,couponToUse, pointsToUse);
+		return new UserDto.Selection(autoSelectRequest.getUserId(), cartAmount, payAmount, savingsToUse, couponToUse, pointsToUse);
 	}
 
 	private CouponDto selectCoupon(List<CouponDto> coupons) {
-		if(coupons.isEmpty()) return null;
+		if(payAmount==0 || coupons.isEmpty()) return null;
 
 		Collections.sort(coupons, (c1,c2)-> c2.getDiscountRate()-c1.getDiscountRate());
-		payAmount = calcPercentage(payAmount, coupons.get(0).getDiscountRate());
-		return coupons.get(0);
+
+		CouponDto couponToUse = null;
+		for(CouponDto coupon: coupons) {
+			if(coupon.getMinAmount() > cartAmount) continue;
+			payAmount = calcPercentage(payAmount, coupon.getDiscountRate());
+			couponToUse = coupon;
+			break;
+		}
+		return couponToUse;
 	}
 
 	private List<PointDto.Selected> selectPoints(List<PointDto> points) {
-		if(points.isEmpty()) return null;
+		if(payAmount==0 || points.isEmpty()) return null;
 
 		Collections.sort(points, Comparator.comparing(PointDto::getExpiryDate));
 		List<PointDto.Selected> selected = new ArrayList<>();
@@ -54,7 +60,7 @@ public class AutoSelectServiceImpl implements AutoSelectService {
 				selected.add(new PointDto.Selected(pointDto.getId(), point));
 				continue;
 			}
-			selected.add(new PointDto.Selected(pointDto.getId(), payAmount));
+			selected.add(new PointDto.Selected(pointDto.getId(),payAmount));
 			payAmount = 0;
 			break;
 		}
