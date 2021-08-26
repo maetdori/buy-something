@@ -1,4 +1,4 @@
-package com.maetdori.Util;
+package com.maetdori.buysomething.Util;
 
 public class calcPercentage {
     public static int calcPercentage(int amount, int percent) {
