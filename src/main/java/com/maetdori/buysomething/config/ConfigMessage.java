@@ -1,7 +1,6 @@
 package com.maetdori.buysomething.config;
 
 import net.rakugakibox.util.YamlResourceBundle;
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -36,17 +35,6 @@ public class ConfigMessage extends WebMvcConfigurerAdapter {
     @Override //Interceptor를 시스템 레지스트리에 등록합니다.
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(localeChangeInterceptor());
-    }
-
-    @Bean("messageSource") //yml 파일을 참조하는 MessageSource 선언합니다.
-    public MessageSource messageSource() {
-        YamlMessageSource ms = new YamlMessageSource();
-        ms.setBasename("message/messages");
-        ms.setDefaultEncoding("UTF-8");
-        ms.setAlwaysUseMessageFormat(true);
-        ms.setUseCodeAsDefaultMessage(true);
-        ms.setFallbackToSystemLocale(true);
-        return ms;
     }
 
     //locale(지역) 정보에 따라 다른 yml 파일을 읽도록 처리합니다.
