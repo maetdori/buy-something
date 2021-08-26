@@ -12,7 +12,7 @@ public class Pay {
 		private Long userId;
 		private int savings;
 		private Long couponId;
-		private List<Point.Selected> points;
+		private List<PointDto.Selected> points;
 	}
 
 	@Getter

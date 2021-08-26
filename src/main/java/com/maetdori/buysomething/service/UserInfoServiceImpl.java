@@ -9,6 +9,8 @@ import com.maetdori.buysomething.web.dto.CouponDto;
 import com.maetdori.buysomething.web.dto.PointDto;
 import com.maetdori.buysomething.web.dto.UserDto;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -29,22 +31,27 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Autowired
     private MessageSource messageSource;
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Override
     @Transactional
     public UserDto.Info getUserInfo(UserDto.Request userRequest) throws NoSuchUserException {
-        Long userId = userRequest.getUserId();
+        User user = userRepo.findByUserName(userRequest.getUserName()).orElseThrow(() -> {
+            String message = messageSource.getMessage("userNotFound.msg", null, LocaleContextHolder.getLocale());
+            logger.error(message);
+            return new NoSuchUserException(message);
+        });
 
-        User user = userRepo.findById(userId).orElseThrow(()
-                -> new NoSuchUserException(messageSource.getMessage("userNotFound", null, LocaleContextHolder.getLocale())));
+        Long userId = user.getId();
 
         int savings = user.getSavings();
 
         List<PointDto> points = pointRepo.findAllByUserIdAndExpiryDateGreaterThanEqual(userId, LocalDate.now())
                 .stream().map(PointDto::new).collect(Collectors.toList());
 
-        List<CouponDto> coupons = couponRepo.findAllByUserIdAndMinAmountLessThan(userId, userRequest.getAmount())
+        List<CouponDto> coupons = couponRepo.findAllByUserId(userId)
                 .stream().map(CouponDto::new).collect(Collectors.toList());
 
-        return new UserDto.Info(userId, savings, points, coupons);
+        return new UserDto.Info(userId, 0, savings, points, coupons);
     }
 }
