@@ -2,6 +2,7 @@ package com.maetdori.buysomething.web.api;
 
 import com.maetdori.buysomething.exception.NoSuchUserException;
 import com.maetdori.buysomething.service.AutoSelectService;
+import com.maetdori.buysomething.service.MakePaymentService;
 import com.maetdori.buysomething.service.UserInfoService;
 import com.maetdori.buysomething.web.dto.UserDto;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderController {
     private final UserInfoService userInfoService;
     private final AutoSelectService autoSelectService;
+    private final MakePaymentService makePaymentService;
 
     @PostMapping("/order")
     public UserDto.Info getUserInfo(@RequestBody UserDto userRequest) throws NoSuchUserException {
@@ -25,4 +27,8 @@ public class OrderController {
         return autoSelectService.getSelection(autoSelectRequest.getInfo());
     }
 
+    @PostMapping("/order/make-payment")
+    public Long makePayment(@RequestBody UserDto paymentRequest) {
+        return makePaymentService.makePayment(paymentRequest.getSelection());
+    }
 }

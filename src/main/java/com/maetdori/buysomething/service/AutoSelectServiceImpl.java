@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.maetdori.buysomething.Util.calcPercentage.calcPercentage;
+import static com.maetdori.buysomething.Util.Percent.discountPercent;
 
 @RequiredArgsConstructor
 @Service
@@ -41,7 +41,7 @@ public class AutoSelectServiceImpl implements AutoSelectService {
 		CouponDto couponToUse = null;
 		for(CouponDto coupon: coupons) {
 			if(coupon.getMinAmount() > cartAmount) continue;
-			payAmount = calcPercentage(payAmount, coupon.getDiscountRate());
+			payAmount = discountPercent(payAmount, coupon.getDiscountRate());
 			couponToUse = coupon;
 			break;
 		}
@@ -49,10 +49,12 @@ public class AutoSelectServiceImpl implements AutoSelectService {
 	}
 
 	private List<PointDto.Selected> selectPoints(List<PointDto> points) {
-		if(payAmount==0 || points.isEmpty()) return null;
+		List<PointDto.Selected> selected = new ArrayList<>();
+
+		if(payAmount==0 || points.isEmpty()) return selected;
 
 		Collections.sort(points, Comparator.comparing(PointDto::getExpiryDate));
-		List<PointDto.Selected> selected = new ArrayList<>();
+
 		for(PointDto pointDto: points) {
 			int point = pointDto.getAmount();
 			if(payAmount > point) {
