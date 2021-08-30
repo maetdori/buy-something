@@ -20,6 +20,7 @@ public class AutoSelectServiceTest {
 	@Autowired
 	AutoSelectService autoSelectService;
 
+	//사용자이름, 주문금액, 자동할인 적용 후 금액
 	static Stream<Arguments> nameAndExpectedCostProvider() {
 		return Stream.of(
 				arguments("andy123", 56000, 40700),

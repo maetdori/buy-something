@@ -1,7 +1,7 @@
 package com.maetdori.buysomething.Util;
 
-public class calcPercentage {
-    public static int calcPercentage(int amount, int percent) {
+public class Percent {
+    public static int discountPercent(int amount, int percent) {
         return amount / 100 * (100-percent);
     }
 }
