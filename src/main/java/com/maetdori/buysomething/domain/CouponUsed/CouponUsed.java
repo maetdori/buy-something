@@ -1,4 +1,4 @@
-package com.maetdori.buysomething.domain.Payment;
+package com.maetdori.buysomething.domain.CouponUsed;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,23 +9,24 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Entity
-public class Payment {
+public class CouponUsed {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Long userId;
 
-    private int savingsUsed;
+    private Long paymentId;
 
-    private LocalDateTime purchaseDate;
+    private String name;
 
-    private LocalDateTime refundDate;
+    private int discountRate;
+
+    private int minAmount;
 }

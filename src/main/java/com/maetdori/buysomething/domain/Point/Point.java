@@ -20,4 +20,8 @@ public class Point {
 	private int amount;
 
 	private LocalDate expiryDate;
+
+	public void usePoint(int pointToUse) {
+		this.amount -= pointToUse;
+	}
 }
