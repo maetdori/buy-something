@@ -11,7 +11,6 @@ import com.maetdori.buysomething.web.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
@@ -28,8 +27,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     private final PointRepository pointRepo;
     private final CouponRepository couponRepo;
 
-    @Autowired
-    private MessageSource messageSource;
+    private final MessageSource messageSource;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
