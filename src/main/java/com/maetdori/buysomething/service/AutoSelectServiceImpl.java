@@ -1,8 +1,6 @@
 package com.maetdori.buysomething.service;
 
-import com.maetdori.buysomething.web.dto.CouponDto;
-import com.maetdori.buysomething.web.dto.PointDto;
-import com.maetdori.buysomething.web.dto.UserDto;
+import com.maetdori.buysomething.web.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,29 +15,47 @@ import static com.maetdori.buysomething.Util.Percent.discountPercent;
 @RequiredArgsConstructor
 @Service
 public class AutoSelectServiceImpl implements AutoSelectService {
-	private int cartAmount;
-	private int payAmount;
+	private int cartAmount; //사용자가 장바구니에 담은 주문금액
+	private int payAmount; //할인이 적용된 최종 결제금액을 저장할 변수
 
 	@Override
 	@Transactional
-	public UserDto.Selection getSelection(UserDto.Info autoSelectRequest) {
-		cartAmount = autoSelectRequest.getCartAmount();
-		payAmount = cartAmount;
+	public Selection getSelection(UserInfo userInfo) {
+		cartAmount = userInfo.getCartAmount();
+		payAmount = cartAmount; //주문금액으로 초기화
 
-		CouponDto couponToUse = selectCoupon(autoSelectRequest.getCoupons());
-		List<PointDto.Selected> pointsToUse = selectPoints(autoSelectRequest.getPoints());
-		int savingsToUse = selectSavings(autoSelectRequest.getSavings());
+		//자동할인 적용순서: 쿠폰 -> 포인트 -> 적립금
 
-		return new UserDto.Selection(autoSelectRequest.getUserId(), cartAmount, payAmount, savingsToUse, couponToUse, pointsToUse);
+		//1. 쿠폰 1개 이상 있을 경우 쿠폰 자동선택
+		CouponDto couponToUse =
+				userInfo.hasCoupons() ? selectCoupon(userInfo.getCoupons()) : null;
+
+		//2. 포인트 1개 이상 있을 경우 포인트 자동선택
+		List<PointDto> pointsToUse =
+				userInfo.hasPoints() ? selectPoints(userInfo.getPoints()) : new ArrayList<>();
+
+		//3. 적립금 있을 경우 적립금 자동선택
+		SavingsDto savingsToUse =
+				userInfo.hasSavings() ? selectSavings(userInfo.getSavings()) : null;
+
+		return Selection.builder()
+				.userId(userInfo.getUserId())
+				.payAmount(payAmount)
+				.savings(savingsToUse)
+				.coupon(couponToUse)
+				.points(pointsToUse)
+				.build();
 	}
 
 	private CouponDto selectCoupon(List<CouponDto> coupons) {
-		if(payAmount==0 || coupons.isEmpty()) return null;
+		//최종 결제금액이 0이 된 경우 리턴
+		if(payAmount==0) return null;
 
+		//할인율 기준 내림차순 정렬
 		Collections.sort(coupons, (c1,c2)-> c2.getDiscountRate()-c1.getDiscountRate());
 
 		CouponDto couponToUse = null;
-		for(CouponDto coupon: coupons) {
+		for(CouponDto coupon: coupons) { //최소주문금액을 만족하는 가장 큰 할인율 쿠폰을 찾는다.
 			if(coupon.getMinAmount() > cartAmount) continue;
 			payAmount = discountPercent(payAmount, coupon.getDiscountRate());
 			couponToUse = coupon;
@@ -48,10 +64,11 @@ public class AutoSelectServiceImpl implements AutoSelectService {
 		return couponToUse;
 	}
 
-	private List<PointDto.Selected> selectPoints(List<PointDto> points) {
-		List<PointDto.Selected> selected = new ArrayList<>();
+	private List<PointDto> selectPoints(List<PointDto> points) {
+		List<PointDto> selected = new ArrayList<>();
 
-		if(payAmount==0 || points.isEmpty()) return selected;
+		//최종 결제금액이 0이 된 경우 리턴
+		if(payAmount==0) return selected;
 
 		Collections.sort(points, Comparator.comparing(PointDto::getExpiryDate));
 
@@ -59,18 +76,42 @@ public class AutoSelectServiceImpl implements AutoSelectService {
 			int point = pointDto.getAmount();
 			if(payAmount > point) {
 				payAmount -= point;
-				selected.add(new PointDto.Selected(pointDto.getId(), point));
+				selected.add(PointDto.builder()
+						.id(pointDto.getId())
+						.amount(point)
+						.build());
 				continue;
 			}
-			selected.add(new PointDto.Selected(pointDto.getId(),payAmount));
+			selected.add(PointDto.builder()
+					.id(pointDto.getId())
+					.amount(payAmount)
+					.build());
 			payAmount = 0;
 			break;
 		}
 		return selected;
 	}
 
-	private int selectSavings(int savings) {
-		payAmount = payAmount < savings ? 0 : payAmount-savings;
-		return Math.min(payAmount, savings);
+	private SavingsDto selectSavings(SavingsDto savings) {
+		//최종 결제금액이 0이 된 경우 리턴
+		if(payAmount==0) return null;
+
+		int savingsAmount = savings.getAmount();
+
+		int savingsToUse;
+
+		if(payAmount > savingsAmount) {
+			savingsToUse = savingsAmount;
+			payAmount -= savingsToUse;
+		}
+		else {
+			savingsToUse = payAmount;
+			payAmount = 0;
+		}
+
+		return SavingsDto.builder()
+				.id(savings.getId())
+				.amount(savingsToUse)
+				.build();
 	}
 }

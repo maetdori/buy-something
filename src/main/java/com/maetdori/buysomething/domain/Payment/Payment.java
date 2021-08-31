@@ -1,31 +1,33 @@
 package com.maetdori.buysomething.domain.Payment;
 
-import lombok.AllArgsConstructor;
+import com.maetdori.buysomething.domain.User.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Entity
 public class Payment {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "payment_id")
+    private Integer id;
 
-    private Long userId;
-
-    private int savingsUsed;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private LocalDateTime purchaseDate;
 
-    private LocalDateTime refundDate;
+    private boolean refunded;
+
+    @Builder
+    public Payment(User user) {
+        this.user = user;
+        this.purchaseDate = LocalDateTime.now();
+        this.refunded = false;
+    }
 }

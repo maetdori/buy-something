@@ -1,30 +1,34 @@
 package com.maetdori.buysomething.domain.PointUsed;
 
-import lombok.AllArgsConstructor;
+import com.maetdori.buysomething.domain.Payment.Payment;
+import com.maetdori.buysomething.domain.Point.Point;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Entity
 public class PointUsed {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-    private Long userId;
+    @ManyToOne
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
 
-    private Long pointId;
-
-    private Long paymentId;
+    @OneToOne
+    @JoinColumn(name = "point_id")
+    private Point point;
 
     private int amount;
+
+    @Builder
+    public PointUsed(Payment payment, Point point, int amount) {
+        this.payment = payment;
+        this.point = point;
+        this.amount = amount;
+    }
 }
