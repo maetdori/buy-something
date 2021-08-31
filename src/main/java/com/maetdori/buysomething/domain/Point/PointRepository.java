@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface PointRepository extends JpaRepository<Point, Long> {
-    List<Point> findAllByUserIdAndExpiryDateGreaterThanEqual(Long userId, LocalDate now);
+public interface PointRepository extends JpaRepository<Point, Integer> {
+    List<Point> findAllByUserIdAndAmountGreaterThanAndExpiryDateIsGreaterThanEqual(Integer userId, int min, LocalDate now);
 }

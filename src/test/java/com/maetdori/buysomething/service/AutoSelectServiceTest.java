@@ -1,7 +1,9 @@
 package com.maetdori.buysomething.service;
 
 import com.maetdori.buysomething.exception.NoSuchUserException;
-import com.maetdori.buysomething.web.dto.UserDto;
+import com.maetdori.buysomething.web.dto.Selection;
+import com.maetdori.buysomething.web.dto.UserInfo;
+import com.maetdori.buysomething.web.dto.UserRequest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -23,10 +25,10 @@ public class AutoSelectServiceTest {
 	//사용자이름, 주문금액, 자동할인 적용 후 금액
 	static Stream<Arguments> nameAndExpectedCostProvider() {
 		return Stream.of(
-				arguments("andy123", 56000, 40700),
-				arguments("ball123", 78000, 42500),
+				arguments("andy123", 56000, 43500),
+				arguments("ball123", 78000, 55700),
 				arguments("camille123", 28000, 16500),
-				arguments("daisy123", 150000, 61400),
+				arguments("daisy123", 150000, 113900),
 				arguments("emily123", 12000, 0)
 		);
 	}
@@ -34,9 +36,9 @@ public class AutoSelectServiceTest {
 	@ParameterizedTest
 	@MethodSource("nameAndExpectedCostProvider")
 	public void 결제수단_자동선택_테스트(String userName, int cartAmount, int expectedCost) throws NoSuchUserException {
-		UserDto.Info userInfo = userInfoService.getUserInfo(new UserDto.Request(userName));
+		UserInfo userInfo = userInfoService.getUserInfo(new UserRequest(userName));
 		userInfo.setCartAmount(cartAmount);
-		UserDto.Selection selection = autoSelectService.getSelection(userInfo);
+		Selection selection = autoSelectService.getSelection(userInfo);
 		assertThat(selection.getPayAmount()).isEqualTo(expectedCost);
 	}
 }

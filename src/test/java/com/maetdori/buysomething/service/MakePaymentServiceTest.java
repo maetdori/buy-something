@@ -1,11 +1,7 @@
 package com.maetdori.buysomething.service;
 
-import com.maetdori.buysomething.domain.CouponUsed.CouponUsedRepository;
-import com.maetdori.buysomething.domain.PointUsed.PointUsed;
 import com.maetdori.buysomething.domain.PointUsed.PointUsedRepository;
-import com.maetdori.buysomething.web.dto.CouponDto;
-import com.maetdori.buysomething.web.dto.PointDto;
-import com.maetdori.buysomething.web.dto.UserDto;
+import com.maetdori.buysomething.web.dto.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -29,8 +25,6 @@ public class MakePaymentServiceTest {
     MakePaymentService makePaymentService;
     @Autowired
     PointUsedRepository pointUsedRepository;
-    @Autowired
-    CouponUsedRepository couponUsedRepository;
 
     //사용자이름, 주문금액
     static Stream<Arguments> makePaymentTester() {
@@ -47,36 +41,34 @@ public class MakePaymentServiceTest {
     @Transactional
     @MethodSource("makePaymentTester")
     public void 결제요청_처리_테스트(String userName, int cartAmount) {
-        UserDto.Request user = new UserDto.Request(userName);
-        UserDto.Info userBefore = userInfoService.getUserInfo(user);
+        UserRequest user = new UserRequest(userName);
+        UserInfo userBefore = userInfoService.getUserInfo(user);
         userBefore.setCartAmount(cartAmount);
-        UserDto.Selection selection = autoSelectService.getSelection(userBefore);
+        Selection selection = autoSelectService.getSelection(userBefore);
 
-        Long paymentId = makePaymentService.makePayment(selection);
+        makePaymentService.makePayment(selection);
 
-        UserDto.Info userAfter = userInfoService.getUserInfo(user);
+        UserInfo userAfter = userInfoService.getUserInfo(user);
 
         적립금_정상처리_테스트(userBefore.getSavings(), selection.getSavingsToUse(), userAfter.getSavings());
-        포인트_정상처리_테스트(userBefore.getUserId(), paymentId, selection.getPointsToUse());
-        쿠폰_정상처리_테스트(userBefore.getCoupons().size(), selection.getCouponToUse(), userAfter.getCoupons().size());
+        포인트_정상처리_테스트(userBefore.getPoints(), selection.getPointsToUse(), userAfter.getPoints());
+        쿠폰_정상처리_테스트(userBefore.getCoupons(), selection.getCouponToUse(), userAfter.getCoupons());
 
     }
 
-    public void 적립금_정상처리_테스트(int savingsBefore, int savingsUsed, int savingsAfter) {
-        assertThat(savingsAfter).isEqualTo(savingsBefore - savingsUsed);
+    public void 적립금_정상처리_테스트(SavingsDto savingsBefore, SavingsDto savingsUsed, SavingsDto savingsAfter) {
+        assertThat(savingsAfter.getAmount())
+                .isEqualTo(savingsBefore.getAmount() - savingsUsed.getAmount());
     }
 
-    public void 포인트_정상처리_테스트(Long userId, Long paymentId, List<PointDto.Selected> pointSelected) {
-        for(PointDto.Selected point: pointSelected) {
-            Long pointId = point.getId();
-            System.out.println(pointUsedRepository.countAllByUserId(userId));
-            PointUsed pointUsed = pointUsedRepository.findByPointIdAndPaymentId(pointId, paymentId);
-            assertThat(pointUsed.getAmount()).isEqualTo(point.getAmount());
-        }
+    public void 포인트_정상처리_테스트(List<PointDto> pointsBefore, List<PointDto> pointsUsed, List<PointDto> pointsAfter) {
+        assertThat(pointsAfter.size())
+                .isBetween(pointsBefore.size() - pointsUsed.size(),
+                        pointsBefore.size() - pointsUsed.size() +1);
     }
 
-    public void 쿠폰_정상처리_테스트(int couponsBefore, CouponDto couponUsed, int couponsAfter) {
+    public void 쿠폰_정상처리_테스트(List<CouponDto> couponsBefore, CouponDto couponUsed, List<CouponDto> couponsAfter) {
         if(couponUsed == null) return;
-        assertThat(couponsAfter).isEqualTo(couponsBefore-1);
+        assertThat(couponsAfter.size()).isEqualTo(couponsBefore.size()-1);
     }
 }
