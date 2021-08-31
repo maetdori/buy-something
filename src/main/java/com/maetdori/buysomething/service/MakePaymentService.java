@@ -1,12 +1,15 @@
 package com.maetdori.buysomething.service;
 
+import com.maetdori.buysomething.domain.Payment.Payment;
 import com.maetdori.buysomething.web.dto.CouponDto;
-import com.maetdori.buysomething.web.dto.UserDto;
+import com.maetdori.buysomething.web.dto.PointDto;
+import com.maetdori.buysomething.web.dto.SavingsDto;
+import com.maetdori.buysomething.web.dto.Selection;
 
 public interface MakePaymentService {
-    Long makePayment(UserDto.Selection selection);
-    Long savePayment(Long userId, int savingsUsed);
-    void useSavings(Long userId, int savingsToUse);
-    void useCoupon(Long userId, Long paymentId, CouponDto coupon);
-    void usePoint(Long userId, Long paymentId, Long pointId, int pointToUse);
+    Payment makePayment(Selection selection);
+    Payment savePayment(Integer userId);
+    void useSavings(SavingsDto savings, Payment payment);
+    void useCoupon(CouponDto coupon, Payment payment);
+    void usePoint(PointDto point, Payment payment);
 }
