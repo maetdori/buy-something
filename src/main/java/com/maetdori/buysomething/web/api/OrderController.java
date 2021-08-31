@@ -1,10 +1,13 @@
 package com.maetdori.buysomething.web.api;
 
+import com.maetdori.buysomething.domain.Payment.Payment;
 import com.maetdori.buysomething.exception.NoSuchUserException;
 import com.maetdori.buysomething.service.AutoSelectService;
 import com.maetdori.buysomething.service.MakePaymentService;
 import com.maetdori.buysomething.service.UserInfoService;
-import com.maetdori.buysomething.web.dto.UserDto;
+import com.maetdori.buysomething.web.dto.Selection;
+import com.maetdori.buysomething.web.dto.UserInfo;
+import com.maetdori.buysomething.web.dto.UserRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,17 +21,17 @@ public class OrderController {
     private final MakePaymentService makePaymentService;
 
     @PostMapping("/order")
-    public UserDto.Info getUserInfo(@RequestBody UserDto userRequest) throws NoSuchUserException {
-        return userInfoService.getUserInfo(userRequest.getRequest());
+    public UserInfo getUserInfo(@RequestBody UserRequest userRequest) throws NoSuchUserException {
+        return userInfoService.getUserInfo(userRequest);
     }
 
     @PostMapping("/order/auto-select")
-    public UserDto.Selection getSelection(@RequestBody UserDto autoSelectRequest) {
-        return autoSelectService.getSelection(autoSelectRequest.getInfo());
+    public Selection getSelection(@RequestBody UserInfo userInfo) {
+        return autoSelectService.getSelection(userInfo);
     }
 
     @PostMapping("/order/make-payment")
-    public Long makePayment(@RequestBody UserDto paymentRequest) {
-        return makePaymentService.makePayment(paymentRequest.getSelection());
+    public Payment makePayment(@RequestBody Selection selection) {
+        return makePaymentService.makePayment(selection);
     }
 }

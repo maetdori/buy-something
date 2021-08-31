@@ -1,29 +1,26 @@
-package com.maetdori.buysomething.domain.Point;
+package com.maetdori.buysomething.domain.Savings;
 
 import com.maetdori.buysomething.domain.User.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 
 @Getter
 @NoArgsConstructor
 @Entity
-public class Point {
+public class Savings {
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "point_id")
+	@Column(name = "savings_id")
 	private Integer id;
 
-	@ManyToOne
+	@OneToOne
 	@JoinColumn(name = "user_id")
 	private User user;
 
 	private int amount;
 
-	private LocalDate expiryDate;
-
-	public void usePoint(int pointToUse) {
-		this.amount -= pointToUse;
+	public void useSavings(int savingsToUse) {
+		this.amount -= savingsToUse;
 	}
 }

@@ -54,7 +54,7 @@ buy-something
 | 순서 | 한글항목명 | 영문항목명 | 속성 | 길이 | NULL | KEY | DEFAULT |
 | :--: | :--------: | :-------: | :--: | :--: | :--: | :-: | :-----: | 
 | 1 | ID | id | INT | 11 | NOTNULL | PK | AUTO_INCREMENT |
-| 2 | 사용자이름 | user_name | VARCHAR | 50 | | | | 
+| 2 | 사용자이름 | user_name | VARCHAR | 50 | NOTNULL | | | 
 
 <br />
 
@@ -84,9 +84,10 @@ buy-something
 | 순서 | 한글항목명 | 영문항목명 | 속성 | 길이 | NULL | KEY | DEFAULT | 
 | :--: | :--------: | :-------: | :--: | :--: | :--: | :-: | :-----: | 
 | 1 | ID | id | INT | 11 | NOTNULL | PK | AUTO_INCREMENT |
-| 2 | 사용자ID | user_id | INT | | NOTNULL | FK | |
-| 3 | 쿠폰명 | coupon_name | VARCHAR | 50 | NOTNULL | | |
+| 2 | 사용자ID | user_id | INT | 11 | NOTNULL | FK | |
+| 3 | 결제ID | payment_id | INT | 11 | | | NULL |
 | 4 | 사용여부 | expired | TINYINT | 4 | NOTNULL | | 0 |
+| 5 | 쿠폰종류 | coupon_type | INT | 11 | NOTNULL | | |
 
 <br />
 
@@ -107,7 +108,7 @@ buy-something
 | :--: | :--------: | :-------: | :--: | :--: | :--: | :-: | :-----: | 
 | 1 | ID | id | INT | 11 | NOTNULL | PK | AUTO_INCREMENT |
 | 2 | 결제ID | payment_id | INT | 11 | NOTNULL | FK | | 
-| 3 | 사용적립금 | point_id | INT | 11 | NOTNULL | | |
+| 3 | 사용적립금 | amount | INT | 11 | NOTNULL | | |
 
 <br />
 
