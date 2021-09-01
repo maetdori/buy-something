@@ -1,4 +1,4 @@
-package com.maetdori.buysomething.service;
+package com.maetdori.buysomething.service.MakePaymentService;
 
 import com.maetdori.buysomething.domain.Payment.Payment;
 import com.maetdori.buysomething.web.dto.CouponDto;
