@@ -1,6 +1,10 @@
 package com.maetdori.buysomething.service;
 
 import com.maetdori.buysomething.domain.PointUsed.PointUsedRepository;
+import com.maetdori.buysomething.service.AutoSelectService.AutoSelectService;
+import com.maetdori.buysomething.service.MakePaymentService.MakePaymentService;
+import com.maetdori.buysomething.service.UserInfoService.UserInfoService;
+import com.maetdori.buysomething.validation.UserValidation;
 import com.maetdori.buysomething.web.dto.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -26,6 +30,8 @@ public class MakePaymentServiceTest {
     @Autowired
     PointUsedRepository pointUsedRepository;
 
+    UserValidation userValidation;
+
     //사용자이름, 주문금액
     static Stream<Arguments> makePaymentTester() {
         return Stream.of(
@@ -41,14 +47,14 @@ public class MakePaymentServiceTest {
     @Transactional
     @MethodSource("makePaymentTester")
     public void 결제요청_처리_테스트(String userName, int cartAmount) {
-        UserRequest user = new UserRequest(userName);
-        UserInfo userBefore = userInfoService.getUserInfo(user);
+        Integer userId = userValidation.getUserIfExist(new UserRequest(userName)).getId();
+        UserInfo userBefore = userInfoService.getUserInfo(userId);
         userBefore.setCartAmount(cartAmount);
         Selection selection = autoSelectService.getSelection(userBefore);
 
         makePaymentService.makePayment(selection);
 
-        UserInfo userAfter = userInfoService.getUserInfo(user);
+        UserInfo userAfter = userInfoService.getUserInfo(userId);
 
         적립금_정상처리_테스트(userBefore.getSavings(), selection.getSavingsToUse(), userAfter.getSavings());
         포인트_정상처리_테스트(userBefore.getPoints(), selection.getPointsToUse(), userAfter.getPoints());

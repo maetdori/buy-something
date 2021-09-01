@@ -2,16 +2,15 @@ package com.maetdori.buysomething.web.api;
 
 import com.maetdori.buysomething.domain.Payment.Payment;
 import com.maetdori.buysomething.exception.NoSuchUserException;
-import com.maetdori.buysomething.service.AutoSelectService;
-import com.maetdori.buysomething.service.MakePaymentService;
-import com.maetdori.buysomething.service.UserInfoService;
+import com.maetdori.buysomething.service.AutoSelectService.AutoSelectService;
+import com.maetdori.buysomething.service.MakePaymentService.MakePaymentService;
+import com.maetdori.buysomething.service.UserInfoService.UserInfoService;
+import com.maetdori.buysomething.validation.UserValidation;
 import com.maetdori.buysomething.web.dto.Selection;
 import com.maetdori.buysomething.web.dto.UserInfo;
 import com.maetdori.buysomething.web.dto.UserRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -20,13 +19,17 @@ public class OrderController {
     private final AutoSelectService autoSelectService;
     private final MakePaymentService makePaymentService;
 
+    private final UserValidation userValidation;
+
     @PostMapping("/order")
     public UserInfo getUserInfo(@RequestBody UserRequest userRequest) throws NoSuchUserException {
-        return userInfoService.getUserInfo(userRequest);
+        Integer userId = userValidation.getUserIfExist(userRequest).getId();
+        return userInfoService.getUserInfo(userId);
     }
 
-    @PostMapping("/order/auto-select")
-    public Selection getSelection(@RequestBody UserInfo userInfo) {
+    @GetMapping("/order/auto-select")
+    public Selection getSelection(@PathVariable Integer userId) {
+        UserInfo userInfo = userInfoService.getUserInfo(userId);
         return autoSelectService.getSelection(userInfo);
     }
 
