@@ -4,8 +4,8 @@ import com.maetdori.buysomething.exception.NoSuchUserException;
 import com.maetdori.buysomething.service.AutoSelectService.AutoSelectService;
 import com.maetdori.buysomething.service.UserInfoService.UserInfoService;
 import com.maetdori.buysomething.validation.UserValidation;
-import com.maetdori.buysomething.web.dto.Selection;
-import com.maetdori.buysomething.web.dto.UserInfo;
+import com.maetdori.buysomething.web.dto.SelectionDto;
+import com.maetdori.buysomething.web.dto.UserInfoDto;
 import com.maetdori.buysomething.web.dto.UserRequest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -41,9 +41,9 @@ public class AutoSelectServiceTest {
 	@ParameterizedTest
 	@MethodSource("nameAndExpectedCostProvider")
 	public void 결제수단_자동선택_테스트(String userName, int cartAmount, int expectedCost) throws NoSuchUserException {
-		UserInfo userInfo = userInfoService.getUserInfo(userValidation.getUserIfExist(new UserRequest(userName)).getId());
+		UserInfoDto userInfo = userInfoService.getUserInfo(userValidation.getUserIfExist(new UserRequest(userName)).getId());
 		userInfo.setCartAmount(cartAmount);
-		Selection selection = autoSelectService.getSelection(userInfo);
+		SelectionDto selection = autoSelectService.getSelection(userInfo);
 		assertThat(selection.getPayAmount()).isEqualTo(expectedCost);
 	}
 }

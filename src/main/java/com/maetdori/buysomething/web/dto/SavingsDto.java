@@ -1,11 +1,13 @@
 package com.maetdori.buysomething.web.dto;
 
 import com.maetdori.buysomething.domain.Savings.Savings;
-import lombok.Builder;
+import com.maetdori.buysomething.domain.SavingsUsed.SavingsUsed;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @NoArgsConstructor
 public class SavingsDto {
 	private Integer id;
@@ -16,9 +18,7 @@ public class SavingsDto {
 		this.amount = entity.getAmount();
 	}
 
-	@Builder
-	public SavingsDto(Integer id, int amount) {
-		this.id = id;
-		this.amount = amount;
+	public SavingsDto(SavingsUsed entity) {
+		this.amount = entity.getAmount();
 	}
 }

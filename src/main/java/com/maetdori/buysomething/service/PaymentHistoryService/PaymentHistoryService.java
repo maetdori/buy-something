@@ -1,9 +1,9 @@
 package com.maetdori.buysomething.service.PaymentHistoryService;
 
-import com.maetdori.buysomething.web.dto.PaymentDto;
+import com.maetdori.buysomething.web.dto.HistoryDto;
 
 import java.util.List;
 
 public interface PaymentHistoryService {
-    List<PaymentDto> getPaymentList(Integer userId);
+    List<HistoryDto> getPaymentList(Integer userId);
 }

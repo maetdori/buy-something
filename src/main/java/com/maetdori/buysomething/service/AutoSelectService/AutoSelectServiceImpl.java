@@ -1,5 +1,6 @@
 package com.maetdori.buysomething.service.AutoSelectService;
 
+import com.maetdori.buysomething.util.Percent;
 import com.maetdori.buysomething.web.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,8 +11,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.maetdori.buysomething.Util.Percent.discountPercent;
-
 @RequiredArgsConstructor
 @Service
 public class AutoSelectServiceImpl implements AutoSelectService {
@@ -20,7 +19,7 @@ public class AutoSelectServiceImpl implements AutoSelectService {
 
 	@Override
 	@Transactional
-	public Selection getSelection(UserInfo userInfo) {
+	public SelectionDto getSelection(UserInfoDto userInfo) {
 		cartAmount = userInfo.getCartAmount();
 		payAmount = cartAmount; //주문금액으로 초기화
 
@@ -38,9 +37,9 @@ public class AutoSelectServiceImpl implements AutoSelectService {
 		SavingsDto savingsToUse =
 				userInfo.hasSavings() ? selectSavings(userInfo.getSavings()) : null;
 
-		return Selection.builder()
+		return SelectionDto.builder()
 				.userId(userInfo.getUserId())
-				.payAmount(payAmount)
+				.cartAmount(cartAmount)
 				.savings(savingsToUse)
 				.coupon(couponToUse)
 				.points(pointsToUse)
@@ -57,7 +56,7 @@ public class AutoSelectServiceImpl implements AutoSelectService {
 		CouponDto couponToUse = null;
 		for(CouponDto coupon: coupons) { //최소주문금액을 만족하는 가장 큰 할인율 쿠폰을 찾는다.
 			if(coupon.getMinAmount() > cartAmount) continue;
-			payAmount = discountPercent(payAmount, coupon.getDiscountRate());
+			payAmount = Percent.discountPercent(payAmount, coupon.getDiscountRate());
 			couponToUse = coupon;
 			break;
 		}
@@ -76,16 +75,11 @@ public class AutoSelectServiceImpl implements AutoSelectService {
 			int point = pointDto.getAmount();
 			if(payAmount > point) {
 				payAmount -= point;
-				selected.add(PointDto.builder()
-						.id(pointDto.getId())
-						.amount(point)
-						.build());
+				selected.add(pointDto);
 				continue;
 			}
-			selected.add(PointDto.builder()
-					.id(pointDto.getId())
-					.amount(payAmount)
-					.build());
+			pointDto.setAmount(payAmount);
+			selected.add(pointDto);
 			payAmount = 0;
 			break;
 		}
@@ -109,9 +103,7 @@ public class AutoSelectServiceImpl implements AutoSelectService {
 			payAmount = 0;
 		}
 
-		return SavingsDto.builder()
-				.id(savings.getId())
-				.amount(savingsToUse)
-				.build();
+		savings.setAmount(savingsToUse);
+		return savings;
 	}
 }

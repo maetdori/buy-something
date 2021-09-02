@@ -20,13 +20,16 @@ public class Payment {
     @JoinColumn(name = "user_id")
     private User user;
 
+    private int cartAmount;
+
     private LocalDateTime purchaseDate;
 
     private boolean refunded;
 
     @Builder
-    public Payment(User user) {
+    public Payment(User user, int cartAmount) {
         this.user = user;
+        this.cartAmount = cartAmount;
         this.purchaseDate = LocalDateTime.now();
         this.refunded = false;
     }
