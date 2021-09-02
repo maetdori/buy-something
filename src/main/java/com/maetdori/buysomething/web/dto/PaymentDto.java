@@ -1,19 +1,24 @@
 package com.maetdori.buysomething.web.dto;
 
-import com.maetdori.buysomething.domain.Payment.Payment;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
 public class PaymentDto {
-	private Integer id;
-	private LocalDateTime purchaseDate;
+    private int cartAmount;
+    private CouponDto usedCoupon;
+    private List<PointDto> usedPoints;
+    private SavingsDto usedSavings;
 
-	public PaymentDto(Payment entity) {
-		this.id = entity.getId();
-		this.purchaseDate = entity.getPurchaseDate();
-	}
+    @Builder
+    public PaymentDto(int cartAmount, CouponDto coupon, List<PointDto> points, SavingsDto savings) {
+        this.cartAmount = cartAmount;
+        this.usedCoupon = coupon;
+        this.usedPoints = points;
+        this.usedSavings = savings;
+    }
 }

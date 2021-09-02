@@ -1,8 +1,8 @@
 package com.maetdori.buysomething.service.UserInfoService;
 
 import com.maetdori.buysomething.exception.NoSuchUserException;
-import com.maetdori.buysomething.web.dto.UserInfo;
+import com.maetdori.buysomething.web.dto.UserInfoDto;
 
 public interface UserInfoService {
-    UserInfo getUserInfo(Integer userId) throws NoSuchUserException;
+    UserInfoDto getUserInfo(Integer userId) throws NoSuchUserException;
 }

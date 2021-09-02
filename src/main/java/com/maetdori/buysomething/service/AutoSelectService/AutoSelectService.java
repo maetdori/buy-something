@@ -1,8 +1,8 @@
 package com.maetdori.buysomething.service.AutoSelectService;
 
-import com.maetdori.buysomething.web.dto.Selection;
-import com.maetdori.buysomething.web.dto.UserInfo;
+import com.maetdori.buysomething.web.dto.SelectionDto;
+import com.maetdori.buysomething.web.dto.UserInfoDto;
 
 public interface AutoSelectService {
-	Selection getSelection(UserInfo autoSelectRequest);
+	SelectionDto getSelection(UserInfoDto autoSelectRequest);
 }
