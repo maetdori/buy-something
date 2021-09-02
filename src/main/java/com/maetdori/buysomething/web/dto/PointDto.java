@@ -1,14 +1,16 @@
 package com.maetdori.buysomething.web.dto;
 
 import com.maetdori.buysomething.domain.Point.Point;
+import com.maetdori.buysomething.domain.PointUsed.PointUsed;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PointDto {
@@ -22,9 +24,8 @@ public class PointDto {
 		this.expiryDate = entity.getExpiryDate();
 	}
 
-	@Builder
-	public PointDto(Integer id, int amount) {
-		this.id = id;
-		this.amount = amount;
+	public PointDto(PointUsed entity) {
+		this.amount = entity.getAmount();
+		this.expiryDate = entity.getPoint().getExpiryDate();
 	}
 }

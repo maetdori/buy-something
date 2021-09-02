@@ -21,12 +21,9 @@ public class Coupon {
 	@JoinColumn(name = "user_id")
 	private User user;
 
-	/*
 	@OneToOne
 	@JoinColumn(name = "payment_id")
 	private Payment payment;
-
-	 */
 
 	private boolean expired;
 

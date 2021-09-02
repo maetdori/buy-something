@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Selection {
+public class SelectionDto {
 	private Integer userId;
 	private int cartAmount;
 	private int payAmount;
@@ -19,9 +19,9 @@ public class Selection {
 	private List<PointDto> pointsToUse;
 
 	@Builder
-	public Selection(Integer userId, int payAmount, SavingsDto savings, CouponDto coupon, List<PointDto> points) {
+	public SelectionDto(Integer userId, int cartAmount, SavingsDto savings, CouponDto coupon, List<PointDto> points) {
 		this.userId = userId;
-		this.payAmount = payAmount;
+		this.cartAmount = cartAmount;
 		this.savingsToUse = savings;
 		this.couponToUse = coupon;
 		this.pointsToUse = points;

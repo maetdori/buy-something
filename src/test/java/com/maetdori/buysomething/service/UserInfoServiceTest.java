@@ -63,7 +63,7 @@ public class UserInfoServiceTest {
     }
 
     public void validate(UserRequest userRequest, Expected expected) throws NoSuchUserException {
-        UserInfo user = userInfoService.getUserInfo(userValidation.getUserIfExist(userRequest).getId());
+        UserInfoDto user = userInfoService.getUserInfo(userValidation.getUserIfExist(userRequest).getId());
 
         SavingsDto savings = user.getSavings();
         List<PointDto> points = user.getPoints();

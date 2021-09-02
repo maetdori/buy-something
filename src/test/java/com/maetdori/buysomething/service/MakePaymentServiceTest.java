@@ -48,13 +48,13 @@ public class MakePaymentServiceTest {
     @MethodSource("makePaymentTester")
     public void 결제요청_처리_테스트(String userName, int cartAmount) {
         Integer userId = userValidation.getUserIfExist(new UserRequest(userName)).getId();
-        UserInfo userBefore = userInfoService.getUserInfo(userId);
+        UserInfoDto userBefore = userInfoService.getUserInfo(userId);
         userBefore.setCartAmount(cartAmount);
-        Selection selection = autoSelectService.getSelection(userBefore);
+        SelectionDto selection = autoSelectService.getSelection(userBefore);
 
         makePaymentService.makePayment(selection);
 
-        UserInfo userAfter = userInfoService.getUserInfo(userId);
+        UserInfoDto userAfter = userInfoService.getUserInfo(userId);
 
         적립금_정상처리_테스트(userBefore.getSavings(), selection.getSavingsToUse(), userAfter.getSavings());
         포인트_정상처리_테스트(userBefore.getPoints(), selection.getPointsToUse(), userAfter.getPoints());
