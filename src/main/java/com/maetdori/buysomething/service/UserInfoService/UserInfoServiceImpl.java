@@ -24,7 +24,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserInfo getUserInfo(Integer userId) throws NoSuchUserException {
+    public UserInfoDto getUserInfo(Integer userId) throws NoSuchUserException {
         SavingsDto savings = new SavingsDto(savingsRepo.findByUserId(userId));
 
         //유저가 가진 포인트들 중 (포인트액수 > 0 && 만료일 >= 현재)를 만족하는 포인트 리스트
@@ -37,7 +37,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         List<CouponDto> coupons = couponRepo.findAllByUserIdAndExpiredFalse(userId)
                 .stream().map(CouponDto::new).collect(Collectors.toList());
 
-        return UserInfo.builder()
+        return UserInfoDto.builder()
                 .userId(userId)
                 .savings(savings)
                 .points(points)

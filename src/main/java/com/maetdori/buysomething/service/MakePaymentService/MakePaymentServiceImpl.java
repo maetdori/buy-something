@@ -29,16 +29,17 @@ public class MakePaymentServiceImpl implements MakePaymentService {
     private final PointRepository pointRepo;
     private final PointUsedRepository pointUsedRepo;
 
-
     @Override
     @Transactional
-    public Payment makePayment(Selection selection) {
+    public Payment makePayment(SelectionDto selection) {
         Integer userId = selection.getUserId();
+        int cartAmount = selection.getCartAmount();
+
         SavingsDto savings = selection.getSavingsToUse();
         CouponDto coupon = selection.getCouponToUse();
         List<PointDto> points = selection.getPointsToUse();
 
-        Payment payment = savePayment(userId);
+        Payment payment = savePayment(userId, cartAmount);
 
         if(selection.containsSavings()) useSavings(savings, payment);
         if(selection.containsCoupon()) useCoupon(coupon, payment);
@@ -51,9 +52,10 @@ public class MakePaymentServiceImpl implements MakePaymentService {
     }
 
     @Override
-    public Payment savePayment(Integer userId) {
+    public Payment savePayment(Integer userId, int cartAmount) {
         return paymentRepo.save(Payment.builder()
                 .user(userRepo.getById(userId))
+                .cartAmount(cartAmount)
                 .build());
     }
 
@@ -61,7 +63,7 @@ public class MakePaymentServiceImpl implements MakePaymentService {
     public void useSavings(SavingsDto savingsToUse, Payment payment) {
         //적립금 차감
         int amountToUse = savingsToUse.getAmount();
-        savingsRepo.findById(savingsToUse.getId()).get()
+        savingsRepo.findById(savingsToUse.getId()).get() //check isPresent()
                 .useSavings(amountToUse);
 
         //사용한 적립금 등록
@@ -73,7 +75,7 @@ public class MakePaymentServiceImpl implements MakePaymentService {
 
     @Override
     public void useCoupon(CouponDto couponToUse, Payment payment) {
-        couponRepo.findById(couponToUse.getId()).get()
+        couponRepo.findById(couponToUse.getId()).get() //check isPresent()
                 .UseCoupon(payment);
     }
 
