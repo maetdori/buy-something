@@ -21,7 +21,7 @@ public class Coupon {
 	@JoinColumn(name = "user_id")
 	private User user;
 
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "payment_id")
 	private Payment payment;
 
@@ -31,7 +31,7 @@ public class Coupon {
 	private CouponType couponType;
 
 	public void UseCoupon(Payment payment) {
-		//this.payment = payment;
+		this.payment = payment;
 		this.expired = true;
 	}
 }

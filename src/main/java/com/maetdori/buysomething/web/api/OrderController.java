@@ -5,7 +5,6 @@ import com.maetdori.buysomething.exception.NoSuchUserException;
 import com.maetdori.buysomething.service.AutoSelectService.AutoSelectService;
 import com.maetdori.buysomething.service.MakePaymentService.MakePaymentService;
 import com.maetdori.buysomething.service.UserInfoService.UserInfoService;
-import com.maetdori.buysomething.validation.UserValidation;
 import com.maetdori.buysomething.web.dto.SelectionDto;
 import com.maetdori.buysomething.web.dto.UserInfoDto;
 import com.maetdori.buysomething.web.dto.UserRequest;
@@ -19,17 +18,14 @@ public class OrderController {
     private final AutoSelectService autoSelectService;
     private final MakePaymentService makePaymentService;
 
-    private final UserValidation userValidation;
-
     @PostMapping("/order")
     public UserInfoDto getUserInfo(@RequestBody UserRequest userRequest) throws NoSuchUserException {
-        Integer userId = userValidation.getUserIfExist(userRequest).getId();
-        return userInfoService.getUserInfo(userId);
+        return userInfoService.getUserInfo(userRequest);
     }
 
-    @GetMapping("/order/{userId}/auto-select")
-    public SelectionDto getSelection(@PathVariable Integer userId) {
-        UserInfoDto userInfo = userInfoService.getUserInfo(userId);
+    @PostMapping("/order/auto-select")
+    public SelectionDto getSelection(@RequestBody UserRequest userRequest) {
+        UserInfoDto userInfo = userInfoService.getUserInfo(userRequest);
         return autoSelectService.getSelection(userInfo);
     }
 

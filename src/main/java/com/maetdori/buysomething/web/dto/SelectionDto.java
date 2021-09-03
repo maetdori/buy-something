@@ -1,15 +1,15 @@
 package com.maetdori.buysomething.web.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
 @Getter
+@Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class SelectionDto {
 	private Integer userId;
 	private int cartAmount;
@@ -19,9 +19,10 @@ public class SelectionDto {
 	private List<PointDto> pointsToUse;
 
 	@Builder
-	public SelectionDto(Integer userId, int cartAmount, SavingsDto savings, CouponDto coupon, List<PointDto> points) {
+	public SelectionDto(Integer userId, int cartAmount, int payAmount, SavingsDto savings, CouponDto coupon, List<PointDto> points) {
 		this.userId = userId;
 		this.cartAmount = cartAmount;
+		this.payAmount = payAmount;
 		this.savingsToUse = savings;
 		this.couponToUse = coupon;
 		this.pointsToUse = points;
