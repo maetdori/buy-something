@@ -53,8 +53,10 @@ public class MakePaymentServiceImpl implements MakePaymentService {
 
     @Override
     public Payment savePayment(Integer userId, int cartAmount) {
+        System.out.println(userId);
+        System.out.println(cartAmount);
         return paymentRepo.save(Payment.builder()
-                .user(userRepo.getById(userId))
+                .user(userRepo.findById(userId).get())
                 .cartAmount(cartAmount)
                 .build());
     }

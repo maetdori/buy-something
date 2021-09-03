@@ -3,7 +3,6 @@ package com.maetdori.buysomething.service;
 import com.maetdori.buysomething.exception.NoSuchUserException;
 import com.maetdori.buysomething.service.AutoSelectService.AutoSelectService;
 import com.maetdori.buysomething.service.UserInfoService.UserInfoService;
-import com.maetdori.buysomething.validation.UserValidation;
 import com.maetdori.buysomething.web.dto.SelectionDto;
 import com.maetdori.buysomething.web.dto.UserInfoDto;
 import com.maetdori.buysomething.web.dto.UserRequest;
@@ -25,8 +24,6 @@ public class AutoSelectServiceTest {
 	@Autowired
 	AutoSelectService autoSelectService;
 
-	UserValidation userValidation;
-
 	//사용자이름, 주문금액, 자동할인 적용 후 금액
 	static Stream<Arguments> nameAndExpectedCostProvider() {
 		return Stream.of(
@@ -41,7 +38,7 @@ public class AutoSelectServiceTest {
 	@ParameterizedTest
 	@MethodSource("nameAndExpectedCostProvider")
 	public void 결제수단_자동선택_테스트(String userName, int cartAmount, int expectedCost) throws NoSuchUserException {
-		UserInfoDto userInfo = userInfoService.getUserInfo(userValidation.getUserIfExist(new UserRequest(userName)).getId());
+		UserInfoDto userInfo = userInfoService.getUserInfo(new UserRequest(userName));
 		userInfo.setCartAmount(cartAmount);
 		SelectionDto selection = autoSelectService.getSelection(userInfo);
 		assertThat(selection.getPayAmount()).isEqualTo(expectedCost);
