@@ -3,9 +3,9 @@ package com.maetdori.buysomething.service.UserInfoService;
 import com.maetdori.buysomething.domain.Coupon.CouponRepository;
 import com.maetdori.buysomething.domain.Point.PointRepository;
 import com.maetdori.buysomething.domain.Savings.SavingsRepository;
+import com.maetdori.buysomething.domain.User.User;
 import com.maetdori.buysomething.domain.User.UserRepository;
-import com.maetdori.buysomething.exception.NoSuchUserException;
-import com.maetdori.buysomething.validator.User.UserValidator;
+import com.maetdori.buysomething.exception.UserNotFoundException;
 import com.maetdori.buysomething.web.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,8 +28,10 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Override
     @Transactional(readOnly = true)
     public UserInfoDto getUserInfo(UserRequest userRequest) {
-        UserValidator.doesUserNameExist(userRequest.getUserName(), userRepo);
-        Integer userId = userRepo.findByUserName(userRequest.getUserName()).get().getId();
+        User user = userRepo.findByUserName(userRequest.getUserName())
+                .orElseThrow(() -> new UserNotFoundException());
+
+        Integer userId = user.getId();
         SavingsDto savings = new SavingsDto(savingsRepo.findByUserId(userId));
 
         //유저가 가진 포인트들 중 (포인트액수 > 0 && 만료일 >= 현재)를 만족하는 포인트 리스트
