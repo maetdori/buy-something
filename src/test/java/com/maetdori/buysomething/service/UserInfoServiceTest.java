@@ -1,6 +1,6 @@
 package com.maetdori.buysomething.service;
 
-import com.maetdori.buysomething.exception.NoSuchUserException;
+import com.maetdori.buysomething.exception.UserNotFoundException;
 import com.maetdori.buysomething.service.UserInfoService.UserInfoService;
 import com.maetdori.buysomething.web.dto.*;
 import org.junit.jupiter.api.DisplayName;
@@ -48,17 +48,17 @@ public class UserInfoServiceTest {
 
     @ParameterizedTest
     @MethodSource("nameAndExpectedProvider")
-    public void 유저_결제수단_조회_테스트(String userName, int savings, int pointSize, int couponSize) throws NoSuchUserException {
+    public void 유저_결제수단_조회_테스트(String userName, int savings, int pointSize, int couponSize) {
         validate(new UserRequest(userName), new Expected(savings, pointSize, couponSize));
     }
 
     @Test
     @DisplayName("TEST: 존재하지 않는 회원")
     public void 존재하지_않는_회원() {
-        assertThrows(NoSuchUserException.class, () -> userInfoService.getUserInfo(new UserRequest("gibson")));
+        assertThrows(UserNotFoundException.class, () -> userInfoService.getUserInfo(new UserRequest("gibson")));
     }
 
-    public void validate(UserRequest userRequest, Expected expected) throws NoSuchUserException {
+    public void validate(UserRequest userRequest, Expected expected) {
         UserInfoDto user = userInfoService.getUserInfo(userRequest);
 
         SavingsDto savings = user.getSavings();
