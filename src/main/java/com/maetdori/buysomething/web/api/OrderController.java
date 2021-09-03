@@ -1,10 +1,10 @@
 package com.maetdori.buysomething.web.api;
 
-import com.maetdori.buysomething.domain.Payment.Payment;
 import com.maetdori.buysomething.exception.NoSuchUserException;
 import com.maetdori.buysomething.service.AutoSelectService.AutoSelectService;
 import com.maetdori.buysomething.service.MakePaymentService.MakePaymentService;
 import com.maetdori.buysomething.service.UserInfoService.UserInfoService;
+import com.maetdori.buysomething.web.dto.PaymentDto;
 import com.maetdori.buysomething.web.dto.SelectionDto;
 import com.maetdori.buysomething.web.dto.UserInfoDto;
 import com.maetdori.buysomething.web.dto.UserRequest;
@@ -30,7 +30,7 @@ public class OrderController {
     }
 
     @PostMapping("/order/make-payment")
-    public Payment makePayment(@RequestBody SelectionDto selection) {
-        return makePaymentService.makePayment(selection);
+    public int makePayment(@RequestBody SelectionDto selection) {
+        return makePaymentService.makePayment(selection); //결제해야 할 금액
     }
 }
