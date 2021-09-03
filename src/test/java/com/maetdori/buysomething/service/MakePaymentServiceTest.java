@@ -4,7 +4,6 @@ import com.maetdori.buysomething.domain.PointUsed.PointUsedRepository;
 import com.maetdori.buysomething.service.AutoSelectService.AutoSelectService;
 import com.maetdori.buysomething.service.MakePaymentService.MakePaymentService;
 import com.maetdori.buysomething.service.UserInfoService.UserInfoService;
-import com.maetdori.buysomething.validation.UserValidation;
 import com.maetdori.buysomething.web.dto.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.transaction.Transactional;
-import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,8 +28,6 @@ public class MakePaymentServiceTest {
     @Autowired
     PointUsedRepository pointUsedRepository;
 
-    UserValidation userValidation;
-
     //사용자이름, 주문금액
     static Stream<Arguments> makePaymentTester() {
         return Stream.of(
@@ -47,34 +43,40 @@ public class MakePaymentServiceTest {
     @Transactional
     @MethodSource("makePaymentTester")
     public void 결제요청_처리_테스트(String userName, int cartAmount) {
-        Integer userId = userValidation.getUserIfExist(new UserRequest(userName)).getId();
-        UserInfoDto userBefore = userInfoService.getUserInfo(userId);
+        UserInfoDto userBefore = userInfoService.getUserInfo(new UserRequest(userName));
+        int savingsBefore = userBefore.getSavings().getAmount();
+        int pointSizeBefore = userBefore.getPoints().size();
+        int couponSizeBefore = userBefore.getCoupons().size();
+
         userBefore.setCartAmount(cartAmount);
         SelectionDto selection = autoSelectService.getSelection(userBefore);
 
         makePaymentService.makePayment(selection);
 
-        UserInfoDto userAfter = userInfoService.getUserInfo(userId);
+        UserInfoDto userAfter = userInfoService.getUserInfo(new UserRequest(userName));
 
-        적립금_정상처리_테스트(userBefore.getSavings(), selection.getSavingsToUse(), userAfter.getSavings());
-        포인트_정상처리_테스트(userBefore.getPoints(), selection.getPointsToUse(), userAfter.getPoints());
-        쿠폰_정상처리_테스트(userBefore.getCoupons(), selection.getCouponToUse(), userAfter.getCoupons());
+        int savingsAfter = userAfter.getSavings().getAmount();
+        int pointSizeAfter = userAfter.getPoints().size();
+        int couponSizeAfter = userAfter.getCoupons().size();
+
+        적립금_정상처리_테스트(savingsBefore, selection.getSavingsToUse().getAmount(), savingsAfter);
+        포인트_정상처리_테스트(pointSizeBefore, selection.getPointsToUse().size(), pointSizeAfter);
+        쿠폰_정상처리_테스트(couponSizeBefore, selection.getCouponToUse(), couponSizeAfter);
 
     }
 
-    public void 적립금_정상처리_테스트(SavingsDto savingsBefore, SavingsDto savingsUsed, SavingsDto savingsAfter) {
-        assertThat(savingsAfter.getAmount())
-                .isEqualTo(savingsBefore.getAmount() - savingsUsed.getAmount());
+    public void 적립금_정상처리_테스트(int savingsBefore, int savingsUsed, int savingsAfter) {
+        assertThat(savingsAfter)
+                .isEqualTo(savingsBefore - savingsUsed);
     }
 
-    public void 포인트_정상처리_테스트(List<PointDto> pointsBefore, List<PointDto> pointsUsed, List<PointDto> pointsAfter) {
-        assertThat(pointsAfter.size())
-                .isBetween(pointsBefore.size() - pointsUsed.size(),
-                        pointsBefore.size() - pointsUsed.size() +1);
+    public void 포인트_정상처리_테스트(int pointSizeBefore, int pointSizeUsed, int pointSizeAfter) {
+        assertThat(pointSizeAfter)
+                .isBetween(pointSizeBefore - pointSizeUsed, pointSizeBefore - pointSizeUsed +1);
     }
 
-    public void 쿠폰_정상처리_테스트(List<CouponDto> couponsBefore, CouponDto couponUsed, List<CouponDto> couponsAfter) {
+    public void 쿠폰_정상처리_테스트(int couponSizeBefore, CouponDto couponUsed, int couponSizeAfter) {
         if(couponUsed == null) return;
-        assertThat(couponsAfter.size()).isEqualTo(couponsBefore.size()-1);
+        assertThat(couponSizeAfter).isEqualTo(couponSizeBefore-1);
     }
 }

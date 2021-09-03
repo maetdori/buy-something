@@ -28,16 +28,4 @@ public class UserInfoDto {
 	public void setCartAmount(int amount) {
 		this.cartAmount = amount;
 	}
-
-	public boolean hasSavings() {
-		return this.savings != null;
-	}
-
-	public boolean hasPoints() {
-		return !this.points.isEmpty();
-	}
-
-	public boolean hasCoupons() {
-		return !this.coupons.isEmpty();
-	}
 }
