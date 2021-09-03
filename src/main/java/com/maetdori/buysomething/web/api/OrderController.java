@@ -1,10 +1,8 @@
 package com.maetdori.buysomething.web.api;
 
-import com.maetdori.buysomething.exception.NoSuchUserException;
 import com.maetdori.buysomething.service.AutoSelectService.AutoSelectService;
 import com.maetdori.buysomething.service.MakePaymentService.MakePaymentService;
 import com.maetdori.buysomething.service.UserInfoService.UserInfoService;
-import com.maetdori.buysomething.web.dto.PaymentDto;
 import com.maetdori.buysomething.web.dto.SelectionDto;
 import com.maetdori.buysomething.web.dto.UserInfoDto;
 import com.maetdori.buysomething.web.dto.UserRequest;
@@ -19,7 +17,7 @@ public class OrderController {
     private final MakePaymentService makePaymentService;
 
     @PostMapping("/order")
-    public UserInfoDto getUserInfo(@RequestBody UserRequest userRequest) throws NoSuchUserException {
+    public UserInfoDto getUserInfo(@RequestBody UserRequest userRequest) {
         return userInfoService.getUserInfo(userRequest);
     }
 

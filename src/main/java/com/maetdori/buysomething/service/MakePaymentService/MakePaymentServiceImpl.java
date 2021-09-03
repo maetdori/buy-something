@@ -1,5 +1,6 @@
 package com.maetdori.buysomething.service.MakePaymentService;
 
+import com.maetdori.buysomething.domain.Coupon.Coupon;
 import com.maetdori.buysomething.domain.Coupon.CouponRepository;
 import com.maetdori.buysomething.domain.Payment.Payment;
 import com.maetdori.buysomething.domain.Payment.PaymentRepository;
@@ -11,6 +12,8 @@ import com.maetdori.buysomething.domain.Savings.SavingsRepository;
 import com.maetdori.buysomething.domain.SavingsUsed.SavingsUsed;
 import com.maetdori.buysomething.domain.SavingsUsed.SavingsUsedRepository;
 import com.maetdori.buysomething.domain.User.UserRepository;
+import com.maetdori.buysomething.exception.CouponNotFoundException;
+import com.maetdori.buysomething.exception.PointNotFoundException;
 import com.maetdori.buysomething.util.Percent;
 import com.maetdori.buysomething.web.dto.*;
 import lombok.RequiredArgsConstructor;
@@ -80,15 +83,19 @@ public class MakePaymentServiceImpl implements MakePaymentService {
 
     @Override
     public void useCoupon(CouponDto couponToUse, Payment payment) {
-        couponRepo.findById(couponToUse.getId()).get() //check isPresent()
-                .useCoupon(payment);
+        Coupon coupon = couponRepo.findById(couponToUse.getId())
+                        .orElseThrow(() -> new CouponNotFoundException());
+
+        coupon.useCoupon(payment);
 
         payment.discount(Percent.discountAmount(payment.getPayAmount(), couponToUse.getDiscountRate()));
     }
 
     @Override
     public void usePoint(PointDto pointToUse, Payment payment) {
-        Point point = pointRepo.getById(pointToUse.getId());
+        Point point = pointRepo.findById(pointToUse.getId())
+                .orElseThrow(() -> new PointNotFoundException());
+
         int amountToUse = pointToUse.getAmount();
 
         //포인트 차감

@@ -1,6 +1,5 @@
 package com.maetdori.buysomething.service;
 
-import com.maetdori.buysomething.exception.NoSuchUserException;
 import com.maetdori.buysomething.service.AutoSelectService.AutoSelectService;
 import com.maetdori.buysomething.service.UserInfoService.UserInfoService;
 import com.maetdori.buysomething.web.dto.SelectionDto;
@@ -37,7 +36,7 @@ public class AutoSelectServiceTest {
 
 	@ParameterizedTest
 	@MethodSource("nameAndExpectedCostProvider")
-	public void 결제수단_자동선택_테스트(String userName, int cartAmount, int expectedCost) throws NoSuchUserException {
+	public void 결제수단_자동선택_테스트(String userName, int cartAmount, int expectedCost) {
 		UserInfoDto userInfo = userInfoService.getUserInfo(new UserRequest(userName));
 		userInfo.setCartAmount(cartAmount);
 		SelectionDto selection = autoSelectService.getSelection(userInfo);

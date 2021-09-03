@@ -1,4 +1,4 @@
-package com.maetdori.buysomething.domain.Enum;
+package com.maetdori.buysomething.domain.Coupon;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
