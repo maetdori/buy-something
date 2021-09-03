@@ -43,7 +43,7 @@ public class AutoSelectServiceImpl implements AutoSelectService {
 
 		for(CouponDto coupon: coupons) { //최소주문금액을 만족하는 가장 큰 할인율 쿠폰을 찾는다.
 			if(coupon.getMinAmount() > selection.getCartAmount()) continue;
-			selection.setPayAmount(Percent.discountPercent(selection.getPayAmount(), coupon.getDiscountRate()));
+			selection.setPayAmount(selection.getPayAmount() - Percent.discountAmount(selection.getPayAmount(), coupon.getDiscountRate()));
 			selection.setCouponToUse(coupon);
 			return;
 		}

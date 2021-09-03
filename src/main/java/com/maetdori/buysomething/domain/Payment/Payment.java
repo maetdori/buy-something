@@ -22,15 +22,25 @@ public class Payment {
 
     private int cartAmount;
 
+    private int payAmount;
+
     private LocalDateTime purchaseDate;
 
-    private boolean refunded;
+    private LocalDateTime refundDate;
 
     @Builder
-    public Payment(User user, int cartAmount) {
+    public Payment(User user, int cartAmount, int payAmount) {
         this.user = user;
         this.cartAmount = cartAmount;
+        this.payAmount = payAmount;
         this.purchaseDate = LocalDateTime.now();
-        this.refunded = false;
+    }
+
+    public void discount(int amount) {
+        this.payAmount -= amount;
+    }
+
+    public void refundPayment() {
+        this.refundDate = LocalDateTime.now();
     }
 }
