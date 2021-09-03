@@ -10,13 +10,15 @@ import java.util.List;
 @NoArgsConstructor
 public class PaymentDto {
     private int cartAmount;
+    private int payAmount;
     private CouponDto usedCoupon;
     private List<PointDto> usedPoints;
     private SavingsDto usedSavings;
 
     @Builder
-    public PaymentDto(int cartAmount, CouponDto coupon, List<PointDto> points, SavingsDto savings) {
+    public PaymentDto(int cartAmount, int payAmount, CouponDto coupon, List<PointDto> points, SavingsDto savings) {
         this.cartAmount = cartAmount;
+        this.payAmount = payAmount;
         this.usedCoupon = coupon;
         this.usedPoints = points;
         this.usedSavings = savings;

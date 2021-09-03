@@ -23,4 +23,8 @@ public class Savings {
 	public void useSavings(int savingsToUse) {
 		this.amount -= savingsToUse;
 	}
+
+	public void resetSavings(int savingsToReset) {
+		this.amount += savingsToReset;
+	}
 }

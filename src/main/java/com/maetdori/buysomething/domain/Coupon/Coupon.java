@@ -30,8 +30,13 @@ public class Coupon {
 	@Convert(converter = CouponTypeInverter.class)
 	private CouponType couponType;
 
-	public void UseCoupon(Payment payment) {
+	public void useCoupon(Payment payment) {
 		this.payment = payment;
 		this.expired = true;
+	}
+
+	public void resetCoupon() {
+		this.payment = null;
+		this.expired = false;
 	}
 }

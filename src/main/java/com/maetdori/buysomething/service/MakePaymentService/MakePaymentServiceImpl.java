@@ -11,6 +11,7 @@ import com.maetdori.buysomething.domain.Savings.SavingsRepository;
 import com.maetdori.buysomething.domain.SavingsUsed.SavingsUsed;
 import com.maetdori.buysomething.domain.SavingsUsed.SavingsUsedRepository;
 import com.maetdori.buysomething.domain.User.UserRepository;
+import com.maetdori.buysomething.util.Percent;
 import com.maetdori.buysomething.web.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ public class MakePaymentServiceImpl implements MakePaymentService {
 
     @Override
     @Transactional
-    public Payment makePayment(SelectionDto selection) {
+    public int makePayment(SelectionDto selection) {
         Integer userId = selection.getUserId();
         int cartAmount = selection.getCartAmount();
 
@@ -41,23 +42,23 @@ public class MakePaymentServiceImpl implements MakePaymentService {
 
         Payment payment = savePayment(userId, cartAmount);
 
-        if(selection.containsSavings()) useSavings(savings, payment);
         if(selection.containsCoupon()) useCoupon(coupon, payment);
         if(selection.containsPoints()) {
             for(PointDto point: points) {
                 usePoint(point, payment);
             }
         }
-        return payment;
+        if(selection.containsSavings()) useSavings(savings, payment);
+
+        return payment.getPayAmount();
     }
 
     @Override
     public Payment savePayment(Integer userId, int cartAmount) {
-        System.out.println(userId);
-        System.out.println(cartAmount);
         return paymentRepo.save(Payment.builder()
                 .user(userRepo.findById(userId).get())
                 .cartAmount(cartAmount)
+                .payAmount(cartAmount)
                 .build());
     }
 
@@ -73,12 +74,16 @@ public class MakePaymentServiceImpl implements MakePaymentService {
                 .payment(payment)
                 .amount(amountToUse)
                 .build());
+
+        payment.discount(amountToUse);
     }
 
     @Override
     public void useCoupon(CouponDto couponToUse, Payment payment) {
         couponRepo.findById(couponToUse.getId()).get() //check isPresent()
-                .UseCoupon(payment);
+                .useCoupon(payment);
+
+        payment.discount(Percent.discountAmount(payment.getPayAmount(), couponToUse.getDiscountRate()));
     }
 
     @Override
@@ -95,5 +100,7 @@ public class MakePaymentServiceImpl implements MakePaymentService {
                 .point(point)
                 .amount(amountToUse)
                 .build());
+
+        payment.discount(amountToUse);
     }
 }
