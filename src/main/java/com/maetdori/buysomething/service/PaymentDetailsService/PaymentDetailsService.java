@@ -1,9 +1,7 @@
 package com.maetdori.buysomething.service.PaymentDetailsService;
 
-import com.maetdori.buysomething.web.dto.PaymentDto;
-
-import java.util.List;
+import com.maetdori.buysomething.web.dto.PaymentDetailDto;
 
 public interface PaymentDetailsService {
-    PaymentDto getPaymentDetails(Integer paymentId);
+    PaymentDetailDto getPaymentDetails(Integer userId, Integer paymentId);
 }

@@ -1,6 +1,7 @@
 package com.maetdori.buysomething.domain.SavingsUsed;
 
 import com.maetdori.buysomething.domain.Payment.Payment;
+import com.maetdori.buysomething.domain.Savings.Savings;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,11 +19,16 @@ public class SavingsUsed {
 	@JoinColumn(name = "payment_id")
 	private Payment payment;
 
+	@OneToOne
+	@JoinColumn(name = "savings_id")
+	private Savings savings;
+
 	private int amount;
 
 	@Builder
-	public SavingsUsed(Payment payment, int amount) {
+	public SavingsUsed(Payment payment, Savings savings, int amount) {
 		this.payment = payment;
+		this.savings = savings;
 		this.amount = amount;
 	}
 }

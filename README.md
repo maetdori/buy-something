@@ -15,7 +15,7 @@ buy-something
 * 환불을 위한 API
   * getPaymentHistory: 사용자의 결제 이력을 불러온다.
   * getPaymentDetails: 특정 결제내역을 상세조회한다.
-  * giveRefund: 환불요청을 처리한다.
+  * makeRefund: 환불요청을 처리한다.
 
 <br />
 
@@ -32,7 +32,7 @@ buy-something
 <br />
 
 ### Get Auto Selected Result
-클라이언트가 "/order/{userId}/auto-select"를 요청하면 OrderController는 AutoSelectService를 통해 자동선택된 결제수단 정보를 받아와 이를 반환합니다.                        
+클라이언트가 "/order/auto-select"를 요청하면 OrderController는 AutoSelectService를 통해 자동선택된 결제수단 정보를 받아와 이를 반환합니다.                        
 
 <img src = "img/getSelection.png" width="600px" />                
 
@@ -111,7 +111,7 @@ buy-something
 | 1 | ID | coupon_id | INT | 11 | NOTNULL | PK | AUTO_INCREMENT |
 | 2 | 사용자ID | user_id | INT | 11 | NOTNULL | FK | |
 | 3 | 결제ID | payment_id | INT | 11 | | | NULL |
-| 4 | 사용여부 | expired | TINYINT | 4 | NOTNULL | | 0 |
+| 4 | 사용여부 | used | TINYINT | 4 | NOTNULL | | 0 |
 | 5 | 쿠폰종류 | coupon_type | INT | 11 | NOTNULL | | |
 
 <br />
@@ -123,8 +123,9 @@ buy-something
 | 1 | ID | payment_id | INT | 11 | NOTNULL | PK | AUTO_INCREMENT |
 | 2 | 사용자ID | user_id | INT | 11 | NOTNULL | FK | | 
 | 3 | 주문금액 | cart_amount | INT | 11 | NOTNULL | | | 
-| 4 | 결제일자 | purchase_date | DATETIME | | NOTNULL | | |
-| 5 | 환불여부 | refunded | TINYINT | 4 | NOTNULL | | 0 |
+| 4 | 결제금액 | pay_amount | INT | 11 | NOTNULL | | | 
+| 5 | 결제일자 | purchase_date | DATETIME | | NOTNULL | | |
+| 6 | 환불일자 | refund_date | DATETIME | | | | NULL |
 
 <br />
 
@@ -134,7 +135,8 @@ buy-something
 | :--: | :--------: | :-------: | :--: | :--: | :--: | :-: | :-----: | 
 | 1 | ID | id | INT | 11 | NOTNULL | PK | AUTO_INCREMENT |
 | 2 | 결제ID | payment_id | INT | 11 | NOTNULL | FK | | 
-| 3 | 사용적립금 | amount | INT | 11 | NOTNULL | | |
+| 3 | 적립금ID | savings_id | INT | 11 | NOTNULL | FK | | 
+| 4 | 사용적립금 | amount | INT | 11 | NOTNULL | | |
 
 <br />
 
