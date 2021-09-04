@@ -12,7 +12,9 @@ import lombok.Setter;
 public class RefundDto {
 	private int repayAmount;
 
-	public void minusExpiredPoint(int amount) {
-		this.repayAmount -= amount;
+	public void cantRefundExpiredPoint(int amount) {
+		if(repayAmount > amount)
+			this.repayAmount -= amount;
+		else repayAmount = 0;
 	}
 }
