@@ -8,11 +8,11 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
-public class HistoryDto {
+public class PaymentHistoryDto {
 	private Integer id;
 	private LocalDateTime purchaseDate;
 
-	public HistoryDto(Payment entity) {
+	public PaymentHistoryDto(Payment entity) {
 		this.id = entity.getId();
 		this.purchaseDate = entity.getPurchaseDate();
 	}

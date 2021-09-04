@@ -1,7 +1,7 @@
 package com.maetdori.buysomething.service.PaymentHistoryService;
 
 import com.maetdori.buysomething.domain.Payment.PaymentRepository;
-import com.maetdori.buysomething.web.dto.HistoryDto;
+import com.maetdori.buysomething.web.dto.PaymentHistoryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,8 +16,9 @@ public class PaymentHistoryServiceImpl implements PaymentHistoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<HistoryDto> getPaymentList(Integer userId) {
+    public List<PaymentHistoryDto> getPaymentList(Integer userId) {
+        //날짜 기준 내림차순 정렬된 결제이력 반환
         return paymentRepository.findAllByUserIdOrderByPurchaseDateDesc(userId).stream()
-                .map(HistoryDto::new).collect(Collectors.toList());
+                .map(PaymentHistoryDto::new).collect(Collectors.toList());
     }
 }

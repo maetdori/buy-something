@@ -14,9 +14,9 @@ public class SelectionDto {
 	private Integer userId;
 	private int cartAmount;
 	private int payAmount;
-	private SavingsDto savingsToUse;
-	private CouponDto couponToUse;
-	private List<PointDto> pointsToUse;
+	private SavingsDto savingsToUse; //nullable
+	private CouponDto couponToUse; //nullable
+	private List<PointDto> pointsToUse; //empty-able
 
 	@Builder
 	public SelectionDto(Integer userId, int cartAmount, int payAmount, SavingsDto savings, CouponDto coupon, List<PointDto> points) {
@@ -34,9 +34,5 @@ public class SelectionDto {
 
 	public boolean containsCoupon() {
 		return couponToUse != null;
-	}
-
-	public boolean containsPoints() {
-		return !pointsToUse.isEmpty();
 	}
 }
