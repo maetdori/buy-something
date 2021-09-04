@@ -8,19 +8,21 @@ import com.maetdori.buysomething.domain.Point.Point;
 import com.maetdori.buysomething.domain.Point.PointRepository;
 import com.maetdori.buysomething.domain.PointUsed.PointUsed;
 import com.maetdori.buysomething.domain.PointUsed.PointUsedRepository;
+import com.maetdori.buysomething.domain.Savings.Savings;
 import com.maetdori.buysomething.domain.Savings.SavingsRepository;
 import com.maetdori.buysomething.domain.SavingsUsed.SavingsUsed;
 import com.maetdori.buysomething.domain.SavingsUsed.SavingsUsedRepository;
 import com.maetdori.buysomething.domain.User.UserRepository;
 import com.maetdori.buysomething.exception.CouponNotFoundException;
 import com.maetdori.buysomething.exception.PointNotFoundException;
+import com.maetdori.buysomething.exception.SavingsNotFoundException;
 import com.maetdori.buysomething.util.Percent;
 import com.maetdori.buysomething.web.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 @Service
@@ -35,60 +37,73 @@ public class MakePaymentServiceImpl implements MakePaymentService {
 
     @Override
     @Transactional
-    public int makePayment(SelectionDto selection) {
+    public Integer makePayment(SelectionDto selection, LocalDateTime purchaseDate) {
         Integer userId = selection.getUserId();
         int cartAmount = selection.getCartAmount();
 
-        SavingsDto savings = selection.getSavingsToUse();
-        CouponDto coupon = selection.getCouponToUse();
-        List<PointDto> points = selection.getPointsToUse();
+        Payment payment = createPayment(userId, cartAmount, purchaseDate);
 
-        Payment payment = savePayment(userId, cartAmount);
-
-        if(selection.containsCoupon()) useCoupon(coupon, payment);
-        if(selection.containsPoints()) {
-            for(PointDto point: points) {
-                usePoint(point, payment);
-            }
+        useSavings(selection, payment);
+        useCoupon(selection, payment);
+        for(PointDto point: selection.getPointsToUse()) {
+            usePoint(point, payment);
         }
-        if(selection.containsSavings()) useSavings(savings, payment);
 
-        return payment.getPayAmount();
+        return payment.getId();
     }
 
     @Override
-    public Payment savePayment(Integer userId, int cartAmount) {
+    public Payment createPayment(Integer userId, int cartAmount, LocalDateTime purchaseDate) {
         return paymentRepo.save(Payment.builder()
                 .user(userRepo.findById(userId).get())
                 .cartAmount(cartAmount)
-                .payAmount(cartAmount)
+                .payAmount(cartAmount) //결제금액을 주문금액으로 초기화
+                .purchaseDate(purchaseDate)
                 .build());
     }
 
     @Override
-    public void useSavings(SavingsDto savingsToUse, Payment payment) {
-        //적립금 차감
+    public void useSavings(SelectionDto selection, Payment payment) {
+        if(!selection.containsSavings()) return;
+
+        SavingsDto savingsToUse = selection.getSavingsToUse();
         int amountToUse = savingsToUse.getAmount();
-        savingsRepo.findById(savingsToUse.getId()).get() //check isPresent()
-                .useSavings(amountToUse);
+
+        Savings savings = savingsRepo.findById(savingsToUse.getId())
+                .orElseThrow(() -> new SavingsNotFoundException());
+
+        savings.verifyUser(payment.getUser().getId()); //유저의 적립금이 맞는지 확인
+
+        //적립금 차감
+        savings.useSavings(amountToUse);
 
         //사용한 적립금 등록
         savingsUsedRepo.save(SavingsUsed.builder()
                 .payment(payment)
+                .savings(savings)
                 .amount(amountToUse)
                 .build());
 
+        //할인금액 적용
         payment.discount(amountToUse);
     }
 
     @Override
-    public void useCoupon(CouponDto couponToUse, Payment payment) {
+    public void useCoupon(SelectionDto selection, Payment payment) {
+        if(!selection.containsCoupon()) return;
+
+        CouponDto couponToUse = selection.getCouponToUse();
+
         Coupon coupon = couponRepo.findById(couponToUse.getId())
                         .orElseThrow(() -> new CouponNotFoundException());
 
+        coupon.verifyUser(payment.getUser().getId()); //유저의 쿠폰이 맞는지 확인
+
+        //쿠폰 사용
         coupon.useCoupon(payment);
 
-        payment.discount(Percent.discountAmount(payment.getPayAmount(), couponToUse.getDiscountRate()));
+        //할인금액 적용
+        payment.discount(Percent.discountAmount(payment.getCartAmount(), couponToUse.getDiscountRate()));
     }
 
     @Override
@@ -97,6 +112,8 @@ public class MakePaymentServiceImpl implements MakePaymentService {
                 .orElseThrow(() -> new PointNotFoundException());
 
         int amountToUse = pointToUse.getAmount();
+
+        point.verifyUser(payment.getUser().getId()); //유저의 포인트가 맞는지 확인
 
         //포인트 차감
         point.usePoint(amountToUse);
@@ -108,6 +125,7 @@ public class MakePaymentServiceImpl implements MakePaymentService {
                 .amount(amountToUse)
                 .build());
 
+        //할인금액 적용
         payment.discount(amountToUse);
     }
 }

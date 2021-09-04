@@ -41,7 +41,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 
         //유저가 가진 쿠폰들 중 아직 사용하지 않은 쿠폰 리스트
         //없으면 empty 리스트 반환
-        List<CouponDto> coupons = couponRepo.findAllByUserIdAndExpiredFalse(userId)
+        List<CouponDto> coupons = couponRepo.findAllByUserIdAndUsedFalse(userId)
                 .stream().map(CouponDto::new).collect(Collectors.toList());
 
         return UserInfoDto.builder()

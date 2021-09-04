@@ -17,6 +17,7 @@ public class PaymentHistoryServiceImpl implements PaymentHistoryService {
     @Override
     @Transactional(readOnly = true)
     public List<HistoryDto> getPaymentList(Integer userId) {
+        //날짜 기준 내림차순 정렬된 결제이력 반환
         return paymentRepository.findAllByUserIdOrderByPurchaseDateDesc(userId).stream()
                 .map(HistoryDto::new).collect(Collectors.toList());
     }

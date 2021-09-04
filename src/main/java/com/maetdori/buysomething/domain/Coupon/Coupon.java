@@ -4,6 +4,8 @@ import com.maetdori.buysomething.domain.Payment.Payment;
 import com.maetdori.buysomething.domain.User.User;
 import com.maetdori.buysomething.exception.CouponAlreadyUsedException;
 import com.maetdori.buysomething.exception.CouponDoesntMeetMinAmountException;
+import com.maetdori.buysomething.exception.UserCouponNotMatchingException;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,30 +27,42 @@ public class Coupon {
 	@JoinColumn(name = "payment_id")
 	private Payment payment;
 
-	private boolean expired;
+	private boolean used;
 
 	@Convert(converter = CouponTypeInverter.class)
 	private CouponType couponType;
 
+	@Builder
+	public Coupon(User user, CouponType couponType) {
+		this.user = user;
+		this.used = false;
+		this.couponType = couponType;
+	}
+
 	public void useCoupon(Payment payment) {
-		verifyExpiration();
+		verifyUsedCoupon();
 		verifyMinAmount(payment.getCartAmount());
 		this.payment = payment;
-		this.expired = true;
+		this.used = true;
 	}
 
 	public void resetCoupon() {
 		this.payment = null;
-		this.expired = false;
+		this.used = false;
 	}
 
-	private void verifyExpiration() {
-		if(this.expired)
+	private void verifyUsedCoupon() {
+		if(this.used)
 			throw new CouponAlreadyUsedException();
 	}
 
 	private void verifyMinAmount(int cartAmount) {
 		if(cartAmount < this.couponType.getMinAmount())
 			throw new CouponDoesntMeetMinAmountException();
+	}
+
+	public void verifyUser(int userId) {
+		if(this.user.getId() != userId)
+			throw new UserCouponNotMatchingException();
 	}
 }

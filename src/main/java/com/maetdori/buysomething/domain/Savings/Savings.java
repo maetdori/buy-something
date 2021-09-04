@@ -2,6 +2,8 @@ package com.maetdori.buysomething.domain.Savings;
 
 import com.maetdori.buysomething.domain.User.User;
 import com.maetdori.buysomething.exception.SavingsInvalidAmountException;
+import com.maetdori.buysomething.exception.UserSavingsNotMatchingException;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,6 +23,12 @@ public class Savings {
 
 	private int amount;
 
+	@Builder
+	public Savings(User user, int amount) {
+		this.user = user;
+		this.amount = amount;
+	}
+
 	public void useSavings(int savingsToUse) {
 		verifyAmountToUse(savingsToUse);
 		this.amount -= savingsToUse;
@@ -33,5 +41,10 @@ public class Savings {
 	private void verifyAmountToUse(int savingsToUse) {
 		if(savingsToUse < 0 || savingsToUse > this.amount)
 			throw new SavingsInvalidAmountException();
+	}
+
+	public void verifyUser(int userId) {
+		if(this.user.getId() != userId)
+			throw new UserSavingsNotMatchingException();
 	}
 }

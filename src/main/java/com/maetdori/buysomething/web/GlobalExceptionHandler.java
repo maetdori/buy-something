@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
 	/* Invalid Value Exception */
-	
+
 	@ExceptionHandler(value = {CouponAlreadyUsedException.class})
 	protected ResponseEntity<ErrorResponse> handleCouponAlreadyUsedException() {
 		return ErrorResponse.toResponseEntity(ErrorCode.COUPON_ALREADY_USED);
@@ -37,6 +37,39 @@ public class GlobalExceptionHandler {
 		return ErrorResponse.toResponseEntity(ErrorCode.SAVINGS_INVALID_AMOUNT);
 	}
 
+	@ExceptionHandler(value = {DiscountInvalidAmountException.class})
+	protected ResponseEntity<ErrorResponse> handleDiscountInvalidAmountException() {
+		return ErrorResponse.toResponseEntity(ErrorCode.DISCOUNT_INVALID_AMOUNT);
+	}
+
+	@ExceptionHandler(value = {PaymentAlreadyRefundedException.class})
+	protected ResponseEntity<ErrorResponse> handlePaymentAlreadyRefundedException() {
+		return ErrorResponse.toResponseEntity(ErrorCode.PAYMENT_ALREADY_REFUNDED);
+	}
+
+
+	/* Invalid Matching Exception */
+
+	@ExceptionHandler(value = {UserSavingsNotMatchingException.class})
+	protected ResponseEntity<ErrorResponse> handleUserSavingsNotMatchingException() {
+		return ErrorResponse.toResponseEntity(ErrorCode.USER_SAVINGS_NOT_MATCHING);
+	}
+
+	@ExceptionHandler(value = {UserCouponNotMatchingException.class})
+	protected ResponseEntity<ErrorResponse> handleUserCouponNotMatchingException() {
+		return ErrorResponse.toResponseEntity(ErrorCode.USER_COUPON_NOT_MATCHING);
+	}
+
+	@ExceptionHandler(value = {UserPointNotMatchingException.class})
+	protected ResponseEntity<ErrorResponse> handleUserPointNotMatchingException() {
+		return ErrorResponse.toResponseEntity(ErrorCode.USER_POINT_NOT_MATCHING);
+	}
+
+	@ExceptionHandler(value = {UserPaymentNotMatchingException.class})
+	protected ResponseEntity<ErrorResponse> handleUserPaymentNotMatchingException() {
+		return ErrorResponse.toResponseEntity(ErrorCode.USER_PAYMENT_NOT_MATCHING);
+	}
+
 
 	/* Entity Not Found Exception */
 
@@ -50,8 +83,18 @@ public class GlobalExceptionHandler {
 		return ErrorResponse.toResponseEntity(ErrorCode.COUPON_NOT_FOUND);
 	}
 
+	@ExceptionHandler(value = {SavingsNotFoundException.class})
+	protected ResponseEntity<ErrorResponse> handleSavingsNotFoundException() {
+		return ErrorResponse.toResponseEntity(ErrorCode.SAVINGS_NOT_FOUND);
+	}
+
 	@ExceptionHandler(value = {PointNotFoundException.class})
 	protected ResponseEntity<ErrorResponse> handlePointNotFoundException() {
 		return ErrorResponse.toResponseEntity(ErrorCode.POINT_NOT_FOUND);
+	}
+
+	@ExceptionHandler(value = {PaymentNotFoundException.class})
+	protected ResponseEntity<ErrorResponse> handlePaymentNotFoundException() {
+		return ErrorResponse.toResponseEntity(ErrorCode.PAYMENT_NOT_FOUND);
 	}
 }

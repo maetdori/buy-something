@@ -9,6 +9,8 @@ import com.maetdori.buysomething.web.dto.UserRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 @RequiredArgsConstructor
 @RestController
 public class OrderController {
@@ -28,7 +30,7 @@ public class OrderController {
     }
 
     @PostMapping("/order/make-payment")
-    public int makePayment(@RequestBody SelectionDto selection) {
-        return makePaymentService.makePayment(selection); //결제해야 할 금액
+    public Integer makePayment(@RequestBody SelectionDto selection) {
+        return makePaymentService.makePayment(selection, LocalDateTime.now()); //paymentId 반환
     }
 }

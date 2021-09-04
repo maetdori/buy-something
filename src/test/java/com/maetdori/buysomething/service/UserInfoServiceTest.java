@@ -1,10 +1,14 @@
 package com.maetdori.buysomething.service;
 
+import com.maetdori.buysomething.SampleDataInput;
+import com.maetdori.buysomething.domain.Coupon.CouponRepository;
+import com.maetdori.buysomething.domain.Point.PointRepository;
+import com.maetdori.buysomething.domain.Savings.SavingsRepository;
+import com.maetdori.buysomething.domain.User.UserRepository;
 import com.maetdori.buysomething.exception.UserNotFoundException;
 import com.maetdori.buysomething.service.UserInfoService.UserInfoService;
 import com.maetdori.buysomething.web.dto.*;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -19,10 +23,27 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
 public class UserInfoServiceTest {
-    @Autowired
-    UserInfoService userInfoService;
+    @Autowired UserInfoService userInfoService;
+    @Autowired UserRepository userRepo;
+    @Autowired SavingsRepository savingsRepo;
+    @Autowired CouponRepository couponRepo;
+    @Autowired PointRepository pointRepo;
+
+    @BeforeAll
+    void setup() {
+        new SampleDataInput(userRepo, savingsRepo, couponRepo, pointRepo);
+    }
+
+    @AfterAll
+    void clear() {
+        savingsRepo.deleteAll();
+        couponRepo.deleteAll();
+        pointRepo.deleteAll();
+        userRepo.deleteAll();
+    }
 
     class Expected {
         int savings;
@@ -36,7 +57,7 @@ public class UserInfoServiceTest {
         }
     }
 
-    static Stream<Arguments> nameAndExpectedProvider() {
+    Stream<Arguments> nameAndExpectedProvider() {
         return Stream.of(
                 arguments("andy123", 1000, 3, 2),
                 arguments("ball123", 2300, 2, 2),
@@ -48,28 +69,27 @@ public class UserInfoServiceTest {
 
     @ParameterizedTest
     @MethodSource("nameAndExpectedProvider")
-    public void 유저_결제수단_조회_테스트(String userName, int savings, int pointSize, int couponSize) {
+    void 유저_결제수단_조회_테스트(String userName, int savings, int pointSize, int couponSize) {
         validate(new UserRequest(userName), new Expected(savings, pointSize, couponSize));
     }
 
     @Test
-    @DisplayName("TEST: 존재하지 않는 회원")
-    public void 존재하지_않는_회원() {
+    void 존재하지_않는_회원() {
         assertThrows(UserNotFoundException.class, () -> userInfoService.getUserInfo(new UserRequest("gibson")));
     }
 
-    public void validate(UserRequest userRequest, Expected expected) {
-        UserInfoDto user = userInfoService.getUserInfo(userRequest);
+    void validate(UserRequest userRequest, Expected expected) {
+        UserInfoDto userInfo = userInfoService.getUserInfo(userRequest);
 
-        SavingsDto savings = user.getSavings();
-        List<PointDto> points = user.getPoints();
-        List<CouponDto> coupons = user.getCoupons();
+        SavingsDto savings = userInfo.getSavings();
+        List<PointDto> points = userInfo.getPoints();
+        List<CouponDto> coupons = userInfo.getCoupons();
 
         assertThat(savings.getAmount()).isEqualTo(expected.savings);
         assertThat(points.size()).isEqualTo(expected.pointSize);
+        assertThat(coupons.size()).isEqualTo(expected.couponSize);
         for (PointDto point : points) {
             assertThat(point.getExpiryDate()).isAfterOrEqualTo(LocalDate.now());
         }
-        assertThat(coupons.size()).isEqualTo(expected.couponSize);
     }
 }

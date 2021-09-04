@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -25,13 +26,15 @@ public class RefundController {
         return paymentHistoryService.getPaymentList(userId);
     }
 
-    @GetMapping("/history/{paymentId}") //매핑 어떻게 해야 하는지?
-    public PaymentDto getPaymentDetails(@PathVariable(name = "paymentId") Integer paymentId) {
-        return paymentDetailsService.getPaymentDetails(paymentId);
+    @GetMapping("/history/{userId}/{paymentId}")
+    public PaymentDto getPaymentDetails(@PathVariable(name = "userId") Integer userId,
+                                        @PathVariable(name = "paymentId") Integer paymentId) {
+        return paymentDetailsService.getPaymentDetails(userId, paymentId);
     }
 
     @GetMapping("refund/{paymentId}")
-    public RefundDto makeRefund(@PathVariable(name = "paymentId") Integer paymentId) {
-        return makeRefundService.makeRefund(paymentId);
+    public RefundDto makeRefund(@PathVariable(name = "userId") Integer userId,
+                                @PathVariable(name = "paymentId") Integer paymentId) {
+        return makeRefundService.makeRefund(userId, paymentId, LocalDateTime.now());
     }
 }
