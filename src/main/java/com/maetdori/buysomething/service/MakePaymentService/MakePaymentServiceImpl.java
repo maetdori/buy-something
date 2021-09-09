@@ -41,11 +41,11 @@ public class MakePaymentServiceImpl implements MakePaymentService {
         Integer userId = selection.getUserId();
         int cartAmount = selection.getCartAmount();
 
-        Payment payment = createPayment(userId, cartAmount, purchaseDate);
+        Payment payment = createPayment(userId, cartAmount, purchaseDate); //결제정보를 등록
 
-        useSavings(selection, payment);
-        useCoupon(selection, payment);
-        for(PointDto point: selection.getPointsToUse()) {
+        useSavings(selection, payment); //적립금 사용처리
+        useCoupon(selection, payment); //쿠폰 사용처리
+        for(PointDto point: selection.getPointsToUse()) { //포인트 사용처리
             usePoint(point, payment);
         }
 
@@ -64,6 +64,7 @@ public class MakePaymentServiceImpl implements MakePaymentService {
 
     @Override
     public void useSavings(SelectionDto selection, Payment payment) {
+        //사용자가 선택한 할인수단에 적립금이 포함되지 않을 경우
         if(!selection.containsSavings()) return;
 
         SavingsDto savingsToUse = selection.getSavingsToUse();
@@ -90,6 +91,7 @@ public class MakePaymentServiceImpl implements MakePaymentService {
 
     @Override
     public void useCoupon(SelectionDto selection, Payment payment) {
+        //사용자가 선택한 할인수단에 쿠폰이 포함되지 않을 경우
         if(!selection.containsCoupon()) return;
 
         CouponDto couponToUse = selection.getCouponToUse();

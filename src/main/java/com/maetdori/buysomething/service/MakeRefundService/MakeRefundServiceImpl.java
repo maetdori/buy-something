@@ -38,9 +38,9 @@ public class MakeRefundServiceImpl implements MakeRefundService {
 
 		RefundDto refundDto = new RefundDto(targetPayment.getPayAmount());
 
-		resetSavings(targetPayment);
-		resetCoupon(targetPayment);
-		resetPoints(targetPayment, refundDto, refundDate.toLocalDate());
+		resetSavings(targetPayment); //적립금 반환
+		resetCoupon(targetPayment); //쿠폰 반환
+		resetPoints(targetPayment, refundDto, refundDate.toLocalDate()); //포인트 반환
 
 		return refundDto;
 	}
@@ -67,8 +67,8 @@ public class MakeRefundServiceImpl implements MakeRefundService {
 		for(PointUsed pointUsed: pointUsedRepo.findAllByPaymentId(payment.getId())) {
 			Point point = pointUsed.getPoint();
 
-			if(refundDate.isAfter(point.getExpiryDate()))
-				refundDto.cantRefundExpiredPoint(pointUsed.getAmount());
+			if(refundDate.isAfter(point.getExpiryDate())) //유효기간이 만료된 쿠폰이면
+				refundDto.cantRefundExpiredPoint(pointUsed.getAmount()); //환불하지 않는다.
 
 			point.resetPoint(pointUsed.getAmount());
 		}

@@ -13,9 +13,9 @@ public enum CouponType {
 	APP_DOWNLOAD_COUPON(3, "앱 다운로드 쿠폰", 5, 15000);
 
 	private final int code;
-	private final String name;
-	private final int discountRate;
-	private final int minAmount;
+	private final String name; //쿠폰이름
+	private final int discountRate; //할인율
+	private final int minAmount; //최소주문금액
 
 	public static CouponType ofCode(int code) {
 		return Arrays.stream(CouponType.values())

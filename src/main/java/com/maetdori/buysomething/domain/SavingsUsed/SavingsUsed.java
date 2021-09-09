@@ -23,7 +23,7 @@ public class SavingsUsed {
 	@JoinColumn(name = "savings_id")
 	private Savings savings;
 
-	private int amount;
+	private int amount; //적립금 사용 금액
 
 	@Builder
 	public SavingsUsed(Payment payment, Savings savings, int amount) {

@@ -39,6 +39,7 @@ public class Coupon {
 		this.couponType = couponType;
 	}
 
+	//쿠폰 사용처리
 	public void useCoupon(Payment payment) {
 		verifyUsedCoupon();
 		verifyMinAmount(payment.getCartAmount());
@@ -46,21 +47,25 @@ public class Coupon {
 		this.used = true;
 	}
 
+	//쿠폰 환불처리
 	public void resetCoupon() {
 		this.payment = null;
 		this.used = false;
 	}
 
+	//쿠폰 사용여부 검사
 	private void verifyUsedCoupon() {
 		if(this.used)
 			throw new CouponAlreadyUsedException();
 	}
 
+	//쿠폰 최소주문금액 검사
 	private void verifyMinAmount(int cartAmount) {
 		if(cartAmount < this.couponType.getMinAmount())
 			throw new CouponDoesntMeetMinAmountException();
 	}
 
+	//쿠폰 주인 검사
 	public void verifyUser(int userId) {
 		if(this.user.getId() != userId)
 			throw new UserCouponNotMatchingException();

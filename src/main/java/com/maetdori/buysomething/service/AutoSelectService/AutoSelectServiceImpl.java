@@ -35,7 +35,7 @@ public class AutoSelectServiceImpl implements AutoSelectService {
 	}
 
 	private void selectCoupon(UserPayInfoDto userInfo, SelectionDto selection) {
-		List<CouponDto> coupons = userInfo.getCoupons();
+		List<CouponDto> coupons = userInfo.getCoupons(); //유저가 가진 쿠폰 리스트
 
 		//쿠폰이 없을 경우
 		if(coupons.isEmpty()) return;
@@ -43,7 +43,8 @@ public class AutoSelectServiceImpl implements AutoSelectService {
 		//할인율 기준 내림차순 정렬
 		Collections.sort(coupons, (c1,c2)-> c2.getDiscountRate()-c1.getDiscountRate());
 
-		for(CouponDto coupon: coupons) { //최소주문금액을 만족하는 가장 큰 할인율 쿠폰을 찾는다.
+		//최소주문금액을 만족하는 가장 큰 할인율 쿠폰을 찾는다.
+		for(CouponDto coupon: coupons) {
 			if(coupon.getMinAmount() > selection.getCartAmount()) continue;
 
 			int discountAmount = Percent.discountAmount(selection.getCartAmount(), coupon.getDiscountRate());
@@ -55,8 +56,8 @@ public class AutoSelectServiceImpl implements AutoSelectService {
 	}
 
 	private void selectPoints(UserPayInfoDto userInfo, SelectionDto selection) {
-		List<PointDto> points = userInfo.getPoints();
-		List<PointDto> selected = new ArrayList<>();
+		List<PointDto> points = userInfo.getPoints(); //유저가 가진 포인트 리스트
+		List<PointDto> selected = new ArrayList<>(); //선택한 포인트를 저장할 리스트
 
 		//포인트가 없을 경우
 		if(userInfo.getPoints().isEmpty()) {
@@ -64,8 +65,10 @@ public class AutoSelectServiceImpl implements AutoSelectService {
 			return;
 		}
 
+		//유효기간 짧은 순서대로 정렬
 		Collections.sort(points, Comparator.comparing(PointDto::getExpiryDate));
 
+		//가용 포인트 모두 사용
 		for(PointDto pointDto: points) {
 			int point = pointDto.getAmount();
 			int payAmount = selection.getPayAmount();
@@ -87,16 +90,17 @@ public class AutoSelectServiceImpl implements AutoSelectService {
 	}
 
 	private void selectSavings(UserPayInfoDto userInfo, SelectionDto selection) {
-		SavingsDto savings = userInfo.getSavings();
+		SavingsDto savings = userInfo.getSavings(); //유저가 가진 적립금
+
+		int savingsAmount = savings.getAmount(); //유저의 적립금 금액
+		int payAmount = selection.getPayAmount(); //결제예정금액
 
 		//적립금이 없거나 최종 결제금액이 0이 된 경우
-		if(savings.getAmount()==0 || selection.getPayAmount()==0) return;
+		if(savingsAmount==0 || payAmount==0) return;
 
-		int savingsAmount = savings.getAmount();
-		int payAmount = selection.getPayAmount();
+		int savingsToUse; //사용할 적립금
 
-		int savingsToUse;
-
+		//결제예정금액이 보유 적립금보다 큰 경우
 		if(payAmount > savingsAmount) {
 			savingsToUse = savingsAmount;
 			payAmount -= savingsToUse;

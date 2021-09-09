@@ -23,7 +23,7 @@ public class PointUsed {
     @JoinColumn(name = "point_id")
     private Point point;
 
-    private int amount;
+    private int amount; //사용한 포인트 금액
 
     @Builder
     public PointUsed(Payment payment, Point point, int amount) {

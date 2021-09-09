@@ -23,9 +23,9 @@ public class Payment {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private int cartAmount;
+    private int cartAmount; //주문금액
 
-    private int payAmount;
+    private int payAmount; //결제금액
 
     private LocalDateTime purchaseDate;
 
@@ -45,16 +45,19 @@ public class Payment {
         this.payAmount -= amount;
     }
 
+    //결제내역 환불처리
     public void refundPayment(LocalDateTime dateTime) {
         verifyRefundedPayment(); //이미 환불된 결제내역인지 확인
         this.refundDate = dateTime;
     }
 
+    //결제건 환불여부 검사
     private void verifyRefundedPayment() {
         if(refundDate != null)
             throw new PaymentAlreadyRefundedException();
     }
 
+    //결제내역 주인 검사
     public void verifyUser(Integer userId) {
         if(this.user.getId() != userId)
             throw new UserPaymentNotMatchingException();

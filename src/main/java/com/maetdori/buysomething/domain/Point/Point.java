@@ -25,7 +25,7 @@ public class Point {
 
 	private int amount;
 
-	private LocalDate expiryDate;
+	private LocalDate expiryDate; //만료일
 
 	@Builder
 	public Point(User user, int amount, LocalDate expiryDate) {
@@ -34,27 +34,31 @@ public class Point {
 		this.expiryDate = expiryDate;
 	}
 
+	//포인트 사용
 	public void usePoint(int pointToUse) {
-		verifyExpiration();
-		verifyAmountToUse(pointToUse);
+		verifyExpiration(); //만료일 확인
+		verifyAmountToUse(pointToUse); //사용금액 유효성 확인
 		this.amount -= pointToUse;
 	}
 
+	//포인트 환불처리
 	public void resetPoint(int amountToReset) {
 		this.amount += amountToReset;
 	}
 
-
+	//포인트 만료여부 검사
 	private void verifyExpiration() {
 		if(LocalDate.now().isAfter(this.expiryDate))
 			throw new PointExpiredException();
 	}
 
+	//포인트 사용금액 유효성 검사
 	private void verifyAmountToUse(int pointToUse) {
 		if(pointToUse < 0 || pointToUse > this.amount)
 			throw new PointInvalidAmountException();
 	}
 
+	//포인트 주인 검사
 	public void verifyUser(int userId) {
 		if(this.user.getId() != userId)
 			throw new UserPointNotMatchingException();
