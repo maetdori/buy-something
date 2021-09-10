@@ -8,7 +8,7 @@ buy-something
 본 과제에서는 쇼핑몰 상품 주문 프로세스를 구현합니다. 제공하는 API는 크게 두 가지로 분류됩니다.
 
 * 주문 및 결제를 위한 API
-  * getUserInfo: 사용자가 가진 결제수단(적립금, 쿠폰, 포인트)을 불러온다.
+  * getUserPayInfo: 사용자가 가진 결제수단(적립금, 쿠폰, 포인트)을 불러온다.
   * getSelection: 자동으로 결제수단을 선택한다.
   * makePayment: 결제를 요청한다.
 
@@ -19,27 +19,27 @@ buy-something
 
 <br />
 
-# 클래스 다이어그램
+# API
 
-## 주문 프로세스
+## 주문
 주문과 관련한 요청은 OrderController에서 처리합니다.               
 
-### Get User Information
-클라이언트가 "/order"를 요청하면 OrderController는 UserInfoService를 통해 사용자 정보를 받아와 이를 반환합니다.                   
+### GET "/order/{userName}"
+UserPayInfoService를 통해 사용자 정보를 받아와 이를 반환합니다.                   
 
 <img src = "img/getUserInfo.png" width="600px" /> 
 
 <br />
 
-### Get Auto Selected Result
-클라이언트가 "/order/auto-select"를 요청하면 OrderController는 AutoSelectService를 통해 자동선택된 결제수단 정보를 받아와 이를 반환합니다.                        
+### GET "/order/auto-select/{userId}/{cartAmount}"
+AutoSelectService를 통해 자동선택된 결제수단 정보를 받아와 이를 반환합니다.                        
 
 <img src = "img/getSelection.png" width="600px" />                
 
 <br />
 
-### Make Payment          
-클라이언트가 "/order/make-payment"를 요청하면 OrderController는 MakePaymentService를 통해 결제요청을 처리합니다.                          
+### POST "/order/payment"         
+MakePaymentService를 통해 결제요청을 처리합니다.                          
 
 <img src = "img/makePayment.png" width="600px" />                       
 
@@ -49,22 +49,22 @@ buy-something
 ## 환불 프로세스
 환불과 관련한 요청은 RefundController에서 처리합니다.               
 
-### Get User Payment History
-클라이언트가 "/history/{userId}"를 요청하면 RefundController는 PaymentHistoryService를 통해 사용자의 결제이력 정보를 받아와 이를 반환합니다.                   
+### GET "/history/{userId}"
+PaymentHistoryService를 통해 사용자의 결제이력 정보를 받아와 이를 반환합니다.                   
 
 <img src = "img/getPaymentHistory.png" width="600px" /> 
 
 <br />
 
-### Get Payment Details
-클라이언트가 "/history/{userId}/{paymentId}"를 요청하면 RefundController는 PaymentDetailsService를 통해 요청된 결제내역의 상세정보를 받아와 이를 반환합니다.                        
+### GET "/history/{userId}/{paymentId}"
+PaymentDetailsService를 통해 요청된 결제내역의 상세정보를 받아와 이를 반환합니다.                        
 
 <img src = "img/getPaymentDetails.png" width="600px" />                
 
 <br />
 
-### Make Refund          
-클라이언트가 "/refund/{paymentId}"를 요청하면 RefundController는 MakeRefundService를 통해 환불요청을 처리합니다.                          
+### GET "/refund/{userId}/{paymentId}"          
+MakeRefundService를 통해 환불요청을 처리합니다.                          
 
 <img src = "img/makeRefund.png" width="600px" />                       
 
